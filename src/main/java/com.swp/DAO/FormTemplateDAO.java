@@ -5,7 +5,8 @@ import com.swp.Entity.FormTemplate;
 import java.util.Collection;
 
 public interface FormTemplateDAO {
-    Collection<FormTemplate> getAllForms();
 
-    FormTemplate getFormById(int id);
+    Collection<FormTemplate> getAllFormTemplates();
+
+    FormTemplate getFormTemplateById(int id);
 }

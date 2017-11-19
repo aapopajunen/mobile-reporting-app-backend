@@ -25,12 +25,12 @@ class FormTemplateDaoImpl implements FormTemplateDAO {
     }
 
     @Override
-    public Collection<FormTemplate> getAllForms() {
+    public Collection<FormTemplate> getAllFormTemplates() {
         return forms.values();
     }
 
     @Override
-    public FormTemplate getFormById(int id) {
+    public FormTemplate getFormTemplateById(int id) {
         return this.forms.get(id);
     }
 

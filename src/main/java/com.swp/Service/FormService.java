@@ -17,12 +17,12 @@ public class FormService {
     @Qualifier("mysql")
     private FormTemplateDAO formTemplateDAO;
 
-    public Collection<FormTemplate> getAllForms() {
-        return formTemplateDAO.getAllForms();
+    public Collection<FormTemplate> getAllFormTemplates() {
+        return formTemplateDAO.getAllFormTemplates();
     }
 
-    public FormTemplate getFormById(int id) {
-        return this.formTemplateDAO.getFormById(id);
+    public FormTemplate getFormTemplateById(int id) {
+        return this.formTemplateDAO.getFormTemplateById(id);
     }
 
 }

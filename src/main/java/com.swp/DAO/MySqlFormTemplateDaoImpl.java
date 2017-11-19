@@ -32,7 +32,7 @@ public class MySqlFormTemplateDaoImpl implements FormTemplateDAO {
     }
 
     @Override
-    public Collection<FormTemplate> getAllForms() {
+    public Collection<FormTemplate> getAllFormTemplates() {
         //SELECT column_name(s) FROM table_name
         final String sql = "SELECT id, name FROM FormTemplates";
         List<FormTemplate> formTemplates = jdbcTemplate.query(sql, new StudentRowMapper());
@@ -40,7 +40,7 @@ public class MySqlFormTemplateDaoImpl implements FormTemplateDAO {
     }
 
     @Override
-    public FormTemplate getFormById(int id) {
+    public FormTemplate getFormTemplateById(int id) {
         //SELECT column_name(s) FROM table_name where column = value
         final String sql = "SELECT id, name FROM FormTemplates where id = ?";
         FormTemplate formTemplate = jdbcTemplate.queryForObject(sql, new StudentRowMapper(), id);

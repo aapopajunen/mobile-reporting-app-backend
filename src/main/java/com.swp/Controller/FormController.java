@@ -20,13 +20,13 @@ public class FormController {
 
 
     @RequestMapping(method = RequestMethod.GET)
-    public Collection<FormTemplate> getAllForms() {
-        return formService.getAllForms();
+    public Collection<FormTemplate> getAllFormTemplates() {
+        return formService.getAllFormTemplates();
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public FormTemplate getFormById(@PathVariable("id") int id) {
-        return formService.getFormById(id);
+    public FormTemplate getFormTemplateById(@PathVariable("id") int id) {
+        return formService.getFormTemplateById(id);
     }
 
 }
