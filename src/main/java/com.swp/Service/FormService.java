@@ -25,4 +25,12 @@ public class FormService {
         return this.formTemplateDAO.getFormTemplateById(id);
     }
 
+    public void insertFormTemplate(FormTemplate formTemplate) {
+        formTemplateDAO.insertFormTemplate(formTemplate);
+    }
+
+    public void removeFormTemplateById(int id) {
+        formTemplateDAO.removeFormTemplateById(id);
+    }
+
 }

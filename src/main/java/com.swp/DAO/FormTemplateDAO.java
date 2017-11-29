@@ -9,4 +9,9 @@ public interface FormTemplateDAO {
     Collection<FormTemplate> getAllFormTemplates();
 
     FormTemplate getFormTemplateById(int id);
+
+    void insertFormTemplate(FormTemplate formTemplate);
+
+    void removeFormTemplateById(int id);
+
 }

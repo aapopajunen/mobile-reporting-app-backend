@@ -34,4 +34,13 @@ class FormTemplateDaoImpl implements FormTemplateDAO {
         return this.forms.get(id);
     }
 
+    @Override
+    public void insertFormTemplate(FormTemplate formTemplate) {
+
+    }
+
+    @Override
+    public void removeFormTemplateById(int id) {
+
+    }
 }

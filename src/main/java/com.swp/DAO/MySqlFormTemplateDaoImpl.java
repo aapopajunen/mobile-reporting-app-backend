@@ -21,7 +21,7 @@ public class MySqlFormTemplateDaoImpl implements FormTemplateDAO {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public static class StudentRowMapper implements RowMapper<FormTemplate> {
+    public static class FormTemplateRowMapper implements RowMapper<FormTemplate> {
         @Override
         public FormTemplate mapRow(ResultSet resultSet, int i) throws SQLException {
             FormTemplate formTemplate = new FormTemplate();
@@ -35,7 +35,7 @@ public class MySqlFormTemplateDaoImpl implements FormTemplateDAO {
     public Collection<FormTemplate> getAllFormTemplates() {
         //SELECT column_name(s) FROM table_name
         final String sql = "SELECT id, name FROM FormTemplates";
-        List<FormTemplate> formTemplates = jdbcTemplate.query(sql, new StudentRowMapper());
+        List<FormTemplate> formTemplates = jdbcTemplate.query(sql, new FormTemplateRowMapper());
         return formTemplates;
     }
 
@@ -43,7 +43,19 @@ public class MySqlFormTemplateDaoImpl implements FormTemplateDAO {
     public FormTemplate getFormTemplateById(int id) {
         //SELECT column_name(s) FROM table_name where column = value
         final String sql = "SELECT id, name FROM FormTemplates where id = ?";
-        FormTemplate formTemplate = jdbcTemplate.queryForObject(sql, new StudentRowMapper(), id);
+        FormTemplate formTemplate = jdbcTemplate.queryForObject(sql, new FormTemplateRowMapper(), id);
         return formTemplate;
+    }
+
+    @Override
+    public void insertFormTemplate(FormTemplate formTemplate) {
+        final String sql = "INSERT INTO FormTemplates (id, name) VALUE (?,?)";
+        jdbcTemplate.update(sql, formTemplate.getId(), formTemplate.getName());
+    }
+
+    @Override
+    public void removeFormTemplateById(int id) {
+        final String sql = "DELETE FROM FormTemplates WHERE id = ?";
+        jdbcTemplate.update(sql, id);
     }
 }

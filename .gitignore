@@ -9,6 +9,8 @@
 #IDEA
 .idea/
 
+.properties
+
 # BlueJ files
 *.ctxt
 
