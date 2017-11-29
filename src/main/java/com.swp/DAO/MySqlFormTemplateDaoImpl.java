@@ -49,8 +49,8 @@ public class MySqlFormTemplateDaoImpl implements FormTemplateDAO {
 
     @Override
     public void insertFormTemplate(FormTemplate formTemplate) {
-        final String sql = "INSERT INTO FormTemplates (id, name) VALUE (?,?)";
-        jdbcTemplate.update(sql, formTemplate.getId(), formTemplate.getName());
+        final String sql = "INSERT INTO FormTemplates (name) VALUE (?)";
+        jdbcTemplate.update(sql, formTemplate.getName());
     }
 
     @Override
