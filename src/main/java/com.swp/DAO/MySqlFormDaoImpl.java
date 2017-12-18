@@ -1,5 +1,6 @@
 package com.swp.DAO;
 
+import com.mysql.cj.api.result.Row;
 import com.swp.Entity.*;
 
 
@@ -74,6 +75,16 @@ public class MySqlFormDaoImpl implements FormDAO {
                     resultSet.getInt("fieldId"),
                     resultSet.getInt("formId"),
                     resultSet.getString("answer")
+            );
+        }
+    }
+
+    public static class UserRowMapper implements RowMapper<User> {
+        @Override
+        public User mapRow(ResultSet resultSet, int i) throws SQLException {
+            return new User(
+                    resultSet.getInt("id"),
+                    resultSet.getString("username")
             );
         }
     }
@@ -154,13 +165,18 @@ public class MySqlFormDaoImpl implements FormDAO {
 
     @Override
     public Collection<User> getAllUsers() {
-        //TODO
-        return null;
+        final String sql = "SELECT * FROM Users";
+
+        Collection<User> users = jdbcTemplate.query(sql, new UserRowMapper());
+
+        return users;
     }
 
     @Override
     public void createUser(String username) {
-        //TODO
+        final String sql = "INSERT username (username) VALUES (?)";
+
+        jdbcTemplate.update(sql, username);
     }
 
     @Override
