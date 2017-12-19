@@ -1,47 +1,15 @@
 package com.swp.Entity;
 
 public class Layout {
-    private int ID;
-    private String title;
-    private String forms;
-    private String fields;
+    public int id;
+    public String title;
+    public String forms;
+    public String fields;
 
-    public Layout(int ID, String title, String forms, String fields) {
-        this.ID = ID;
+    public Layout(int id, String title, String forms, String fields) {
+        this.id = id;
         this.title = title;
         this.forms = forms;
-        this.fields = fields;
-    }
-
-    public int getID() {
-        return ID;
-    }
-
-    public void setID(int ID) {
-        this.ID = ID;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getForms() {
-        return forms;
-    }
-
-    public void setForms(String forms) {
-        this.forms = forms;
-    }
-
-    public String getFields() {
-        return fields;
-    }
-
-    public void setFields(String fields) {
         this.fields = fields;
     }
 }
