@@ -221,8 +221,6 @@ public class MySqlFormDaoImpl implements FormDAO {
 
     @Override
     public void grantUserAccessRights(String username, Map<String, String> params) {
-        //TODO Add parameter support
-
         final String sql = "INSERT INTO AccessRights (userID, layoutID) VALUES (?,?)";
 
         int userId = this.getUserIdByUsername(username);
@@ -234,7 +232,13 @@ public class MySqlFormDaoImpl implements FormDAO {
 
     @Override
     public void deleteUserAccessRights(String username, Map<String, String> params) {
-        //TODO
+        final String sql = "DELETE FROM AccessRights WHERE userid = ? AND layoutid = ?";
+
+        int userId = this.getUserIdByUsername(username);
+
+        if(params.containsKey("layoutid")) {
+            jdbcTemplate.update(sql, userId, params.get("layoutid"));
+        }
     }
 
     @Override
