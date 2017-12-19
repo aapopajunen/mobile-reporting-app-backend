@@ -62,8 +62,8 @@ public class FormController {
         return formDAO.getAllUsers();
     }
 
-    @RequestMapping(value = "/users", method = RequestMethod.POST)
-    public void createUser(@RequestParam("username") String username) {
+    @RequestMapping(value = "/users/{username}", method = RequestMethod.POST)
+    public void createUser(@PathVariable("username") String username) {
         formDAO.createUser(username);
     }
 
@@ -84,7 +84,7 @@ public class FormController {
 
     @RequestMapping(value = "/users/{username}/rights", method = RequestMethod.POST)
     public void grantUserAccessRights(@PathVariable String username,
-                                       @RequestParam Map<String, String> params) {
+                                      @RequestParam Map<String, String> params) {
         formDAO.grantUserAccessRights(username, params);
     }
 
@@ -107,7 +107,7 @@ public class FormController {
         formDAO.createForm(form);
     }
 
-    //TODO replace userID with username
+    //TODO replace userId with username
     @RequestMapping(value = "/users/{username}/layouts", method = RequestMethod.GET)
     public Collection<Layout> getLayoutsByUser(
             @PathVariable("username") String username,
