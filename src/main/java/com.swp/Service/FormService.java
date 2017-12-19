@@ -31,12 +31,12 @@ public class FormService {
 
     public Collection<Form> filter(
             Optional<String> id,
-            Optional<String> layoutID,
-            Optional<String> userID,
+            Optional<String> layoutId,
+            Optional<String> userId,
             Optional<String> title,
             Optional<String> dateCreated,
             Optional<String> dateAccepted) {
-        formTemplateDAO.filter(id, layoutID, userID, title, dateCreated, dateAccepted);
+        formTemplateDAO.filter(id, layoutId, userId, title, dateCreated, dateAccepted);
     }
     */
 
