@@ -17,14 +17,14 @@ import java.sql.Date;
  * }
  */
 public class Form {
-    public int id;
-    public int layoutId;
-    public int userId;
-    public int orderNo;
-    public String title;
-    public java.sql.Date dateCreated;
-    public java.sql.Date dateAccepted;
-    public String answers;
+    private int id;
+    private int layoutId;
+    private int userId;
+    private int orderNo;
+    private String title;
+    private java.sql.Date dateCreated;
+    private java.sql.Date dateAccepted;
+    private String answers;
 
     public Form(int id, int layoutId, int userId, int orderNo, String title, Date dateCreated, Date dateAccepted, String answers) {
         this.id = id;
@@ -37,8 +37,35 @@ public class Form {
         this.answers = answers;
     }
 
-    public Form() {
-
+    public int getId() {
+        return id;
     }
 
+    public int getLayoutId() {
+        return layoutId;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public int getOrderNo() {
+        return orderNo;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public Date getDateAccepted() {
+        return dateAccepted;
+    }
+
+    public String getAnswers() {
+        return answers;
+    }
 }

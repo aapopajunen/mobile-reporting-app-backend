@@ -1,13 +1,13 @@
 package com.swp.Entity;
 
 public class Field {
-    public int ID;
-    public int layoutID;
-    public String title;
-    public String defaultValue;
-    public int typeID;
-    public int orderNumber;
-    public int required;
+    private int ID;
+    private int layoutID;
+    private String title;
+    private String defaultValue;
+    private int typeID;
+    private int orderNumber;
+    private int required;
 
     public Field(int ID, int layoutID, String title, String defaultValue, int typeID, int orderNumber, int required) {
         this.ID = ID;
@@ -17,5 +17,33 @@ public class Field {
         this.typeID = typeID;
         this.orderNumber = orderNumber;
         this.required = required;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public int getLayoutID() {
+        return layoutID;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public int getTypeID() {
+        return typeID;
+    }
+
+    public int getOrderNumber() {
+        return orderNumber;
+    }
+
+    public int getRequired() {
+        return required;
     }
 }
