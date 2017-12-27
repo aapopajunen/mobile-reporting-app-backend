@@ -63,57 +63,56 @@ public class FormController {
     }
 
     @RequestMapping(value = "/users/{username}", method = RequestMethod.POST)
-    public void createUser(@PathVariable("username") String username) {
+    public void createUser(@PathVariable String username) {
         formDAO.createUser(username);
     }
 
-    @RequestMapping(value = "/users/{username}", method = RequestMethod.GET)
-    public User getUserByUsername(@PathVariable String username) {
-        return formDAO.getUserByUsername(username);
+    @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
+    public User getUserById(@PathVariable int id) {
+        return formDAO.getUserById(id);
     }
 
-    @RequestMapping(value = "/users/{username}", method = RequestMethod.DELETE)
-    public void deleteUser(@PathVariable String username) {
-        formDAO.deleteUser(username);
+    @RequestMapping(value = "/users/{id}", method = RequestMethod.DELETE)
+    public void deleteUser(@PathVariable int id) {
+        formDAO.deleteUser(id);
     }
 
-    @RequestMapping(value = "/users/{username}/rights", method = RequestMethod.GET)
-    public Collection<AccessRights> getUserAccessRights(@PathVariable String username) {
-        return formDAO.getUserAccessRights(username);
+    @RequestMapping(value = "/users/{id}/rights", method = RequestMethod.GET)
+    public Collection<AccessRights> getUserAccessRights(@PathVariable int id) {
+        return formDAO.getUserAccessRights(id);
     }
 
-    @RequestMapping(value = "/users/{username}/rights", method = RequestMethod.POST)
-    public void grantUserAccessRights(@PathVariable String username,
+    @RequestMapping(value = "/users/{id}/rights", method = RequestMethod.POST)
+    public void grantUserAccessRights(@PathVariable int id,
                                       @RequestParam Map<String, String> params) {
-        formDAO.grantUserAccessRights(username, params);
+        formDAO.grantUserAccessRights(id, params);
     }
 
-
-    @RequestMapping(value = "/users/{username}/rights", method = RequestMethod.DELETE)
-    public void deleteUserAccessRights(@PathVariable String username,
+    @RequestMapping(value = "/users/{id}/rights", method = RequestMethod.DELETE)
+    public void deleteUserAccessRights(@PathVariable int id,
                                        @RequestParam Map<String, String> params) {
-        formDAO.deleteUserAccessRights(username, params);
+        formDAO.deleteUserAccessRights(id, params);
     }
 
-    @RequestMapping(value = "/users/{username}/forms", method = RequestMethod.GET)
+    @RequestMapping(value = "/users/{id}/forms", method = RequestMethod.GET)
     public Collection<Form> getFormsByUser(
-            @PathVariable("username") String username,
+            @PathVariable("id") int id,
             @RequestParam Map<String, String> params) {
-        return formDAO.getFormsByUser(username, params);
+        return formDAO.getFormsByUser(id, params);
     }
 
-    @RequestMapping(value = "/users/{username}/forms", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/users/{id}/forms", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public void createForm(@RequestBody Form form) {
+        //TODO add id support
         formDAO.createForm(form);
     }
 
-    //TODO replace userId with username
-    @RequestMapping(value = "/users/{username}/layouts", method = RequestMethod.GET)
+    @RequestMapping(value = "/users/{id}/layouts", method = RequestMethod.GET)
     public Collection<Layout> getLayoutsByUser(
-            @PathVariable("username") String username,
+            @PathVariable("id") int id,
             @RequestParam Map<String, String> params) {
 
-        return formDAO.getLayoutsByUser(username, params);
+        return formDAO.getLayoutsByUser(id, params);
     }
 
 }

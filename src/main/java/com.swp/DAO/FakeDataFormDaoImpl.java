@@ -16,9 +16,9 @@ class FakeDataFormDaoImpl implements FormDAO {
         forms = new HashMap<Integer, Layout>() {
 
             {
-                put(1, new Layout(1, "Raportti 1", "ongi", "kek"));
-                put(2, new Layout(2, "Raportti 2", "pongi", "juu"));
-                put(3, new Layout(3, "Raportti 3", "kys", "terve"));
+                put(1, new Layout(1, "Raportti 1"));
+                put(2, new Layout(2, "Raportti 2"));
+                put(3, new Layout(3, "Raportti 3"));
             }
 
         };
@@ -75,32 +75,32 @@ class FakeDataFormDaoImpl implements FormDAO {
     }
 
     @Override
-    public User getUserByUsername(String username) {
+    public User getUserById(int id) {
         return null;
     }
 
     @Override
-    public void deleteUser(String username) {
+    public void deleteUser(int id) {
 
     }
 
     @Override
-    public Collection<AccessRights> getUserAccessRights(String username) {
+    public Collection<AccessRights> getUserAccessRights(int id) {
         return null;
     }
 
     @Override
-    public void grantUserAccessRights(String username, Map<String, String> params) {
+    public void grantUserAccessRights(int id, Map<String, String> params) {
 
     }
 
     @Override
-    public void deleteUserAccessRights(String username, Map<String, String> params) {
+    public void deleteUserAccessRights(int id, Map<String, String> params) {
 
     }
 
     @Override
-    public Collection<Form> getFormsByUser(String username, Map<String, String> params) {
+    public Collection<Form> getFormsByUser(int id, Map<String, String> params) {
         return null;
     }
 
@@ -110,7 +110,7 @@ class FakeDataFormDaoImpl implements FormDAO {
     }
 
     @Override
-    public Collection<Layout> getLayoutsByUser(String username, Map<String, String> params) {
+    public Collection<Layout> getLayoutsByUser(int id, Map<String, String> params) {
         return null;
     }
 }

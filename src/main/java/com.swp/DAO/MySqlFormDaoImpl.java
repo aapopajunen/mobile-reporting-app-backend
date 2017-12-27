@@ -38,8 +38,7 @@ public class MySqlFormDaoImpl implements FormDAO {
                     resultSet.getInt("orderNo"),
                     resultSet.getString("title"),
                     resultSet.getDate("dateCreated"),
-                    resultSet.getDate("dateAccepted"),
-                    "/forms/" + resultSet.getInt("id") + "/answers"
+                    resultSet.getDate("dateAccepted")
             );
         }
     }
@@ -64,9 +63,7 @@ public class MySqlFormDaoImpl implements FormDAO {
         public Layout mapRow(ResultSet resultSet, int i) throws SQLException {
             return new Layout(
                    resultSet.getInt("id"),
-                   resultSet.getString("title"),
-                    "/forms?layoutid=" + resultSet.getInt("id"),
-                    "/layouts/" + resultSet.getInt("id") + "/fields"
+                   resultSet.getString("title")
             );
         }
     }
@@ -102,9 +99,7 @@ public class MySqlFormDaoImpl implements FormDAO {
         }
     }
 
-
     //METHODS
-
     @Override
     public Collection<Form> getAllForms(Map<String, String> params) {
         String sql = "SELECT * FROM Forms" + this.paramsToSqlString(params);
@@ -193,63 +188,55 @@ public class MySqlFormDaoImpl implements FormDAO {
     }
 
     @Override
-    public User getUserByUsername(String username) {
-        final String sql = "SELECT * FROM Users WHERE username = ?";
+    public User getUserById(int id) {
+        final String sql = "SELECT * FROM Users WHERE id = ?";
 
-        User user = jdbcTemplate.queryForObject(sql, new UserRowMapper(), username);
+        User user = jdbcTemplate.queryForObject(sql, new UserRowMapper(), id);
 
         return user;
     }
 
     @Override
-    public void deleteUser(String username) {
-        final String sql = "DELETE FROM Users WHERE username = ?";
+    public void deleteUser(int id) {
+        final String sql = "DELETE FROM Users WHERE id = ?";
 
-        jdbcTemplate.update(sql, username);
+        jdbcTemplate.update(sql, id);
     }
 
     @Override
-    public Collection<AccessRights> getUserAccessRights(String username) {
+    public Collection<AccessRights> getUserAccessRights(int id) {
         final String sql = "SELECT * FROM AccessRights WHERE userid = ?";
 
-        int userId = this.getUserIdByUsername(username);
-
-        Collection<AccessRights> accessRights = jdbcTemplate.query(sql, new AccessRightsRowMapper(), userId);
+        Collection<AccessRights> accessRights = jdbcTemplate.query(sql, new AccessRightsRowMapper(), id);
 
         return accessRights;
     }
 
     @Override
-    public void grantUserAccessRights(String username, Map<String, String> params) {
+    public void grantUserAccessRights(int id, Map<String, String> params) {
         final String sql = "INSERT INTO AccessRights (userID, layoutID) VALUES (?,?)";
 
-        int userId = this.getUserIdByUsername(username);
-
         if(params.containsKey("layoutid")) {
-            jdbcTemplate.update(sql, userId, params.get("layoutid"));
+            jdbcTemplate.update(sql, id, params.get("layoutid"));
         }
     }
 
     @Override
-    public void deleteUserAccessRights(String username, Map<String, String> params) {
+    public void deleteUserAccessRights(int id, Map<String, String> params) {
         final String sql = "DELETE FROM AccessRights WHERE userid = ? AND layoutid = ?";
 
-        int userId = this.getUserIdByUsername(username);
-
         if(params.containsKey("layoutid")) {
-            jdbcTemplate.update(sql, userId, params.get("layoutid"));
+            jdbcTemplate.update(sql, id, params.get("layoutid"));
         }
     }
 
     @Override
-    public Collection<Form> getFormsByUser(String username, Map<String, String> params) {
+    public Collection<Form> getFormsByUser(int id, Map<String, String> params) {
         //TODO Add parameter support
 
         final String sql = "SELECT * FROM Forms WHERE userId = ?";
 
-        final int userId = this.getUserIdByUsername(username);
-
-        Collection<Form> forms = jdbcTemplate.query(sql, new FormRowMapper(), userId);
+        Collection<Form> forms = jdbcTemplate.query(sql, new FormRowMapper(), id);
 
         return forms;
     }
@@ -260,15 +247,15 @@ public class MySqlFormDaoImpl implements FormDAO {
     }
 
     @Override
-    public Collection<Layout> getLayoutsByUser(String username, Map<String, String> params) {
+    public Collection<Layout> getLayoutsByUser(int id, Map<String, String> params) {
         //TODO Add parameter support
 
         final String sql = "SELECT * FROM Layouts WHERE id IN (:ids)";
 
-        final Collection<AccessRights> accessRights = this.getUserAccessRights(username);
+        final Collection<AccessRights> accessRights = this.getUserAccessRights(id);
 
         Set<Integer> ids = new HashSet();
-        accessRights.forEach((ar) -> ids.add(ar.layoutId));
+        accessRights.forEach((ar) -> ids.add(ar.getLayoutId()));
 
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("ids", ids);
@@ -278,11 +265,10 @@ public class MySqlFormDaoImpl implements FormDAO {
         return layouts;
     }
 
+    public int getUserIdByUsername(int id) {
+        final String sql = "SELECT id FROM Users WHERE id = ?";
 
-    public int getUserIdByUsername(String username) {
-        final String sql = "SELECT id FROM Users WHERE username = ?";
-
-        int userId = jdbcTemplate.queryForObject(sql, Integer.class, username);
+        int userId = jdbcTemplate.queryForObject(sql, Integer.class, id);
 
         return userId;
     }

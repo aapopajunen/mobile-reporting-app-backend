@@ -36,32 +36,32 @@ public interface FormDAO {
     // /users
     Collection<User> getAllUsers();
 
-    // /users
+    // /users/{username}
     void createUser(String username);
 
-    // /users/{username}
-    User getUserByUsername(String username);
+    // /users/{id}
+    User getUserById(int id);
 
-    // /users/{username}
-    void deleteUser(String username);
+    // /users/{id}
+    void deleteUser(int id);
 
-    // /users/{username}/rights
-    Collection<AccessRights> getUserAccessRights(String username);
+    // /users/{id}/rights
+    Collection<AccessRights> getUserAccessRights(int id);
 
-    // /users/{username}/rights
-    void grantUserAccessRights(String username, Map<String,String> params);
+    // /users/{id}/rights
+    void grantUserAccessRights(int id, Map<String,String> params);
 
-    // /users/{username}/rights
-    void deleteUserAccessRights(String username, Map<String, String> params);
+    // /users/{id}/rights
+    void deleteUserAccessRights(int id, Map<String, String> params);
 
-    // /users/{username}/forms
-    Collection<Form> getFormsByUser(String username, Map<String,String> params);
+    // /users/{id}/forms
+    Collection<Form> getFormsByUser(int id, Map<String,String> params);
 
-    // /users/{username}/forms
+    // /users/{id}/forms
     void createForm(Form form);
 
-    // /users/{username}/forms
-    Collection<Layout> getLayoutsByUser(String username, Map<String, String> params);
+    // /users/{id}/forms
+    Collection<Layout> getLayoutsByUser(int id, Map<String, String> params);
 
 
 }
