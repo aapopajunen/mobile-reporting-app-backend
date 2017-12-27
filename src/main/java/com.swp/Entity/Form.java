@@ -24,9 +24,8 @@ public class Form {
     private String title;
     private java.sql.Date dateCreated;
     private java.sql.Date dateAccepted;
-    private String answers;
 
-    public Form(int id, int layoutId, int userId, int orderNo, String title, Date dateCreated, Date dateAccepted, String answers) {
+    public Form(int id, int layoutId, int userId, int orderNo, String title, Date dateCreated, Date dateAccepted) {
         this.id = id;
         this.layoutId = layoutId;
         this.userId = userId;
@@ -34,7 +33,6 @@ public class Form {
         this.title = title;
         this.dateCreated = dateCreated;
         this.dateAccepted = dateAccepted;
-        this.answers = answers;
     }
 
     public int getId() {
@@ -63,9 +61,5 @@ public class Form {
 
     public Date getDateAccepted() {
         return dateAccepted;
-    }
-
-    public String getAnswers() {
-        return answers;
     }
 }
