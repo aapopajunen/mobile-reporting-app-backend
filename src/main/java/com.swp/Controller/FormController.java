@@ -1,11 +1,13 @@
 package com.swp.Controller;
 
-import com.swp.DAO.FormDAO;
 import com.swp.Entity.*;
+
+import com.swp.DAO.FormDAO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -23,21 +25,26 @@ public class FormController {
     }
 
     @RequestMapping(value = "/forms/{id}", method = RequestMethod.GET)
-    public Form getFormById(@PathVariable("id") int formId) {
-        return formDAO.getFormById(formId);
+    public Form getFormById(@PathVariable int id) {
+        return formDAO.getFormById(id);
     }
 
     @RequestMapping(value = "/forms/{id}", method = RequestMethod.DELETE)
-    public void deleteFormById(@PathVariable("id") int formId) {
-        formDAO.deleteFormById(formId);
+    public void deleteFormById(@PathVariable int id) {
+        formDAO.deleteFormById(id);
     }
 
-    @RequestMapping(value = "forms/{id}/fields", method = RequestMethod.GET)
+    @RequestMapping(value = "/forms/{id}", method = RequestMethod.PUT)
+    public void acceptFormById(@PathVariable int id) {
+        formDAO.acceptFormById(id);
+    }
+
+    @RequestMapping(value = "/forms/{id}/fields", method = RequestMethod.GET)
     public Collection<Field> getFieldsByFormId(@PathVariable("id") int formId) {
         return formDAO.getFieldsByFormId(formId);
     }
 
-    @RequestMapping(value = "forms/{id}/answers", method = RequestMethod.GET)
+    @RequestMapping(value = "/forms/{id}/answers", method = RequestMethod.GET)
     public Collection<FieldAnswer> getAnswersByFormId(@PathVariable("id") int formId) {
         return formDAO.getAnswersByFormId(formId);
     }
@@ -47,12 +54,12 @@ public class FormController {
        return formDAO.getAllLayouts();
     }
 
-    @RequestMapping(value = "layouts/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/layouts/{id}", method = RequestMethod.GET)
     public Layout getLayoutById(@PathVariable("id") int formId) {
         return formDAO.getLayoutById(formId);
     }
 
-    @RequestMapping(value = "layouts/{id}/fields", method = RequestMethod.GET)
+    @RequestMapping(value = "/layouts/{id}/fields", method = RequestMethod.GET)
     public Collection<Field> getFieldsByLayoutId(@PathVariable("id") int layoutId) {
         return formDAO.getFieldsByLayoutId(layoutId);
     }
@@ -63,8 +70,8 @@ public class FormController {
     }
 
     @RequestMapping(value = "/users/{username}", method = RequestMethod.POST)
-    public void createUser(@PathVariable String username) {
-        formDAO.createUser(username);
+    public ResponseEntity createUser(@PathVariable String username) {
+        return formDAO.createUser(username);
     }
 
     @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
@@ -72,9 +79,14 @@ public class FormController {
         return formDAO.getUserById(id);
     }
 
+    @RequestMapping(value = "/users/{username}", method = RequestMethod.DELETE)
+    public void deleteUserByUsername(@PathVariable("username") String username) {
+        formDAO.deleteUserByUsername(username);
+    }
+
     @RequestMapping(value = "/users/{id}", method = RequestMethod.DELETE)
-    public void deleteUser(@PathVariable int id) {
-        formDAO.deleteUser(id);
+    public void deleteUserById(@PathVariable("id") int id) {
+        formDAO.deleteUserById(id);
     }
 
     @RequestMapping(value = "/users/{id}/rights", method = RequestMethod.GET)
@@ -102,9 +114,8 @@ public class FormController {
     }
 
     @RequestMapping(value = "/users/{id}/forms", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void createForm(@RequestBody Form form) {
-        //TODO add id support
-        formDAO.createForm(form);
+    public void createForm(@PathVariable int id, @RequestBody Form form) {
+        formDAO.createForm(id, form);
     }
 
     @RequestMapping(value = "/users/{id}/layouts", method = RequestMethod.GET)
