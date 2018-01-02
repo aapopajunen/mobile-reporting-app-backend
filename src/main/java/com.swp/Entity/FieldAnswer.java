@@ -11,6 +11,9 @@ public class FieldAnswer {
         this.answer = answer;
     }
 
+    public FieldAnswer() {
+    }
+
     public int getFieldID() {
         return fieldID;
     }

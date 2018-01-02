@@ -1,14 +1,15 @@
 package com.swp.Entity;
 
 import java.sql.Date;
+import java.util.Collection;
 
 /**
  * Example JSON
  *
  * {
- *     id: 1
- *     layoutId: 1
- *     userId: 1
+ *     ID: 1
+ *     layoutID: 1
+ *     userID: 1
  *     orderNo: 1
  *     title: "Form"
  *     dateCreated: "2017-1-1"
@@ -17,34 +18,50 @@ import java.sql.Date;
  * }
  */
 public class Form {
-    private int id;
-    private int layoutId;
-    private int userId;
+    private int ID;
+    private int layoutID;
+    private int userID;
     private int orderNo;
     private String title;
     private java.sql.Date dateCreated;
     private java.sql.Date dateAccepted;
+    private Collection<FieldAnswer> answers;
 
-    public Form(int id, int layoutId, int userId, int orderNo, String title, Date dateCreated, Date dateAccepted) {
-        this.id = id;
-        this.layoutId = layoutId;
-        this.userId = userId;
+    public Form(int ID, int layoutID, int userID, int orderNo, String title, Date dateCreated, Date dateAccepted, Collection<FieldAnswer> answers) {
+        this.ID = ID;
+        this.layoutID = layoutID;
+        this.userID = userID;
+        this.orderNo = orderNo;
+        this.title = title;
+        this.dateCreated = dateCreated;
+        this.dateAccepted = dateAccepted;
+        this.answers = answers;
+    }
+
+    public Form(int ID, int layoutID, int userID, int orderNo, String title, Date dateCreated, Date dateAccepted) {
+        this.ID = ID;
+        this.layoutID = layoutID;
+        this.userID = userID;
         this.orderNo = orderNo;
         this.title = title;
         this.dateCreated = dateCreated;
         this.dateAccepted = dateAccepted;
     }
 
-    public int getId() {
-        return id;
+    public Form() {
+
     }
 
-    public int getLayoutId() {
-        return layoutId;
+    public int getID() {
+        return ID;
     }
 
-    public int getUserId() {
-        return userId;
+    public int getLayoutID() {
+        return layoutID;
+    }
+
+    public int getUserID() {
+        return userID;
     }
 
     public int getOrderNo() {
@@ -61,5 +78,9 @@ public class Form {
 
     public Date getDateAccepted() {
         return dateAccepted;
+    }
+
+    public Collection<FieldAnswer> getAnswers() {
+        return answers;
     }
 }

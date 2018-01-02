@@ -1,19 +1,19 @@
 package com.swp.Entity;
 
 public class AccessRights {
-    private int userId;
-    private int layoutId;
+    private int userID;
+    private int layoutID;
 
-    public AccessRights(int userId, int layoutId) {
-        this.userId = userId;
-        this.layoutId = layoutId;
+    public AccessRights(int userID, int layoutID) {
+        this.userID = userID;
+        this.layoutID = layoutID;
     }
 
-    public int getUserId() {
-        return userId;
+    public int getUserID() {
+        return userID;
     }
 
-    public int getLayoutId() {
-        return layoutId;
+    public int getLayoutID() {
+        return layoutID;
     }
 }

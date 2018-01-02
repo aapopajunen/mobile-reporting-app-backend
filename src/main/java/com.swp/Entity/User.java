@@ -1,16 +1,16 @@
 package com.swp.Entity;
 
 public class User {
-    private int id;
+    private int ID;
     private String username;
 
-    public User(int id, String username) {
-        this.id = id;
+    public User(int ID, String username) {
+        this.ID = ID;
         this.username = username;
     }
 
-    public int getId() {
-        return id;
+    public int getID() {
+        return ID;
     }
 
     public String getUsername() {
