@@ -7,7 +7,6 @@ import com.swp.DAO.FormDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -70,8 +69,8 @@ public class FormController {
     }
 
     @RequestMapping(value = "/users/{username}", method = RequestMethod.POST)
-    public ResponseEntity createUser(@PathVariable String username) {
-        return formDAO.createUser(username);
+    public void createUser(@PathVariable String username) {
+        formDAO.createUser(username);
     }
 
     @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
