@@ -1,11 +1,10 @@
 package com.swp.DAO;
 
 import com.swp.Entity.*;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 
 public interface FormDAO {
 
@@ -17,6 +16,9 @@ public interface FormDAO {
 
     // /forms/{formId}
     void deleteFormById(int formId);
+
+    // /forms/{formId}
+    void acceptFormById(int formId);
 
     // /forms/{formId}/fields
     Collection<Field> getFieldsByFormId(int formId);
@@ -43,7 +45,10 @@ public interface FormDAO {
     User getUserById(int id);
 
     // /users/{id}
-    void deleteUser(int id);
+    void deleteUserById(int id);
+
+    // /users/{username}
+    void deleteUserByUsername(String username);
 
     // /users/{id}/rights
     Collection<AccessRights> getUserAccessRights(int id);
@@ -58,7 +63,7 @@ public interface FormDAO {
     Collection<Form> getFormsByUser(int id, Map<String,String> params);
 
     // /users/{id}/forms
-    void createForm(Form form);
+    void createForm(int id, Form form);
 
     // /users/{id}/forms
     Collection<Layout> getLayoutsByUser(int id, Map<String, String> params);
