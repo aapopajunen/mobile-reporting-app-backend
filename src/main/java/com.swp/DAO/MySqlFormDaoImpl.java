@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import javax.swing.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -44,7 +45,7 @@ public class MySqlFormDaoImpl implements FormDAO {
         }
     }
 
-    public static class FieldRowMapper implements RowMapper<Field> {
+    public class FieldRowMapper implements RowMapper<Field> {
         @Override
         public Field mapRow(ResultSet resultSet, int i) throws SQLException {
             return new Field(
@@ -59,17 +60,20 @@ public class MySqlFormDaoImpl implements FormDAO {
         }
     }
 
-    public static class LayoutRowMapper implements RowMapper<Layout> {
+    public class LayoutRowMapper implements RowMapper<Layout> {
         @Override
         public Layout mapRow(ResultSet resultSet, int i) throws SQLException {
+            final String sql = "SELECT COUNT(*) FROM Forms WHERE layoutid = ?";
+
             return new Layout(
                    resultSet.getInt("id"),
-                   resultSet.getString("title")
+                   resultSet.getString("title"),
+                    jdbcTemplate.queryForObject(sql, Integer.class, resultSet.getInt("id"))
             );
         }
     }
 
-    public static class FieldAnswerRowMapper implements RowMapper<FieldAnswer> {
+    public class FieldAnswerRowMapper implements RowMapper<FieldAnswer> {
         @Override
         public FieldAnswer mapRow(ResultSet resultSet, int i) throws SQLException {
             return new FieldAnswer(
@@ -80,7 +84,7 @@ public class MySqlFormDaoImpl implements FormDAO {
         }
     }
 
-    public static class UserRowMapper implements RowMapper<User> {
+    public class UserRowMapper implements RowMapper<User> {
         @Override
         public User mapRow(ResultSet resultSet, int i) throws SQLException {
             return new User(
@@ -90,7 +94,7 @@ public class MySqlFormDaoImpl implements FormDAO {
         }
     }
 
-    public static class AccessRightsRowMapper implements RowMapper<AccessRights> {
+    public class AccessRightsRowMapper implements RowMapper<AccessRights> {
         @Override
         public AccessRights mapRow(ResultSet resultSet, int i) throws SQLException {
             return new AccessRights(
@@ -252,7 +256,7 @@ public class MySqlFormDaoImpl implements FormDAO {
     public Collection<Form> getFormsByUser(int id, Map<String, String> params) {
         //TODO Add parameter support
 
-        final String sql = "SELECT * FROM Forms WHERE userId = ?";
+        final String sql = "SELECT * FROM Forms WHERE userId = ?" + this.paramsToSqlString(params);
 
         Collection<Form> forms = jdbcTemplate.query(sql, new FormRowMapper(), id);
 
@@ -263,7 +267,7 @@ public class MySqlFormDaoImpl implements FormDAO {
     public void createForm(int id, Form form) {
         final String formSql = "INSERT INTO Forms (layoutId, userId, orderNo, title, dateCreated) VALUES (?,?,?,?,?)";
         //TODO fix this somehow!
-        final String orderNoSql = "SELECT MAX(orderNo) FROM Forms WHERE layoutId = ?";
+        final String orderNoSql = "SELECT formCount FROM FormCounts WHERE layoutId = ?";
         final String formIdSql = "SELECT LAST_INSERT_ID()";
 
         final int orderNo = jdbcTemplate.queryForObject(orderNoSql, Integer.class, form.getLayoutID()) + 1;
@@ -293,7 +297,13 @@ public class MySqlFormDaoImpl implements FormDAO {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("ids", ids);
 
-        Collection<Layout> layouts = namedParameterJdbcTemplate.query(sql, parameters, new LayoutRowMapper());
+        Collection<Layout> layouts;
+
+        try {
+             layouts = namedParameterJdbcTemplate.query(sql, parameters, new LayoutRowMapper());
+        } catch(Exception e) {
+            return null;
+        }
 
         return layouts;
     }
@@ -309,12 +319,35 @@ public class MySqlFormDaoImpl implements FormDAO {
     public String paramsToSqlString(Map<String, String> params) {
 
         String sql = "";
+        int pageSize = 20;
 
-        for(Map.Entry<String, String> entry : params.entrySet()){
-            if(entry.getKey().equals("layoutid")) {
-                sql = sql + " WHERE layoutid = " + entry.getValue();
+        if(params.containsKey("pagesize")) {
+            pageSize = Integer.valueOf(params.get("pagesize"));
+        }
+
+        if(params.containsKey("layoutid")) {
+            sql = " WHERE layoutid = " + params.get("layoutid");
+        }
+
+        if(params.containsKey("sort")) {
+            sql = sql + " ORDER BY " + "(" + params.get("sort") + ")";
+        }
+
+        if(params.containsKey("page")) {
+            String[] pages = params.get("page").split(",");
+
+            if(pages.length == 2){
+                int startPage = Integer.parseInt(pages[0]) - 1;
+                int endPage = Integer.parseInt(pages[1]);
+                sql = sql + " LIMIT " + startPage*pageSize + "," + (endPage - startPage)*pageSize;
+            }
+
+            if(pages.length == 1){
+                int page = Integer.parseInt(pages[0]) - 1;
+                sql = sql + " LIMIT " + page*pageSize + "," + pageSize;
             }
         }
+
 
         return sql;
     }
