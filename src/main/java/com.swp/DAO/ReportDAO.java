@@ -1,18 +1,17 @@
 package com.swp.DAO;
 
 import com.swp.Entity.*;
-import org.springframework.http.ResponseEntity;
 
 import java.util.Collection;
 import java.util.Map;
 
-public interface FormDAO {
+public interface ReportDAO {
 
     // /forms
-    Collection<Form> getReports(Map<String, String> params);
+    Collection<Report> getReports(Map<String, String> params);
 
     // /forms/{formId}
-    Form getReportsById(int formId);
+    Report getReportsById(int formId);
 
     // /forms/{formId}
     void deleteReportById(int formId);
@@ -27,10 +26,10 @@ public interface FormDAO {
     Collection<FieldAnswer> getAnswersByReportId(int formId);
 
     // /layouts
-    Collection<Layout> getTemplates(Map<String, String> params);
+    Collection<Template> getTemplates(Map<String, String> params);
 
     // /layouts/{layoutid}
-    Layout getTemplateById(int layoutid);
+    Template getTemplateById(int layoutid);
 
     // /layouts/{layoutid}/fields
     Collection<Field> getFieldsByTemplateId(int layoutId);
@@ -60,13 +59,13 @@ public interface FormDAO {
     void deleteUserAccessRights(int id, Map<String, String> params);
 
     // /users/{id}/forms
-    Collection<Form> getReportsByUser(int id, Map<String,String> params);
+    Collection<Report> getReportsByUser(int id, Map<String,String> params);
 
     // /users/{id}/forms
-    void createReport(int id, Form form);
+    void createReport(int id, Report report);
 
     // /users/{id}/forms
-    Collection<Layout> getTemplatesByUser(int id, Map<String, String> params);
+    Collection<Template> getTemplatesByUser(int id, Map<String, String> params);
 
 
 }

@@ -1,17 +1,17 @@
 package com.swp.Entity;
 
-public class Layout {
+public class Template {
     private int ID;
     private String title;
-    private int formCount;
+    private int reportCount;
 
-    public Layout(int ID, String title, int formCount) {
+    public Template(int ID, String title, int reportCount) {
         this.ID = ID;
         this.title = title;
-        this.formCount = formCount;
+        this.reportCount = reportCount;
     }
 
-    public Layout() {
+    public Template() {
 
     }
 
@@ -23,8 +23,8 @@ public class Layout {
         return title;
     }
 
-    public int getFormCount() {
-        return formCount;
+    public int getReportCount() {
+        return reportCount;
     }
 }
 

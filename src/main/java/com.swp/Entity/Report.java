@@ -8,18 +8,18 @@ import java.util.Collection;
  *
  * {
  *     ID: 1
- *     layoutID: 1
+ *     templateID: 1
  *     userID: 1
  *     orderNo: 1
- *     title: "Form"
+ *     title: "Report"
  *     dateCreated: "2017-1-1"
  *     dateAccepted: null
  *     answers: /forms/1/answers
  * }
  */
-public class Form {
+public class Report {
     private int ID;
-    private int layoutID;
+    private int templateID;
     private int userID;
     private int orderNo;
     private String title;
@@ -27,9 +27,9 @@ public class Form {
     private java.sql.Date dateAccepted;
     private Collection<FieldAnswer> answers;
 
-    public Form(int ID, int layoutID, int userID, int orderNo, String title, Date dateCreated, Date dateAccepted, Collection<FieldAnswer> answers) {
+    public Report(int ID, int templateID, int userID, int orderNo, String title, Date dateCreated, Date dateAccepted, Collection<FieldAnswer> answers) {
         this.ID = ID;
-        this.layoutID = layoutID;
+        this.templateID = templateID;
         this.userID = userID;
         this.orderNo = orderNo;
         this.title = title;
@@ -38,9 +38,9 @@ public class Form {
         this.answers = answers;
     }
 
-    public Form(int ID, int layoutID, int userID, int orderNo, String title, Date dateCreated, Date dateAccepted) {
+    public Report(int ID, int templateID, int userID, int orderNo, String title, Date dateCreated, Date dateAccepted) {
         this.ID = ID;
-        this.layoutID = layoutID;
+        this.templateID = templateID;
         this.userID = userID;
         this.orderNo = orderNo;
         this.title = title;
@@ -48,7 +48,7 @@ public class Form {
         this.dateAccepted = dateAccepted;
     }
 
-    public Form() {
+    public Report() {
 
     }
 
@@ -56,8 +56,8 @@ public class Form {
         return ID;
     }
 
-    public int getLayoutID() {
-        return layoutID;
+    public int getTemplateID() {
+        return templateID;
     }
 
     public int getUserID() {

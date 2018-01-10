@@ -17,7 +17,7 @@ import java.util.*;
 
 @Repository
 @Qualifier("mysql")
-public class MySqlFormDaoImpl implements FormDAO {
+public class MySqlReportDaoImpl implements ReportDAO {
 
     //JDBCTEMPATE
     @Autowired
@@ -28,10 +28,10 @@ public class MySqlFormDaoImpl implements FormDAO {
 
     //ROW MAPPERS
 
-    public class FormRowMapper implements RowMapper<Form> {
+    public class FormRowMapper implements RowMapper<Report> {
         @Override
-        public Form mapRow(ResultSet resultSet, int i) throws SQLException {
-            return new Form(
+        public Report mapRow(ResultSet resultSet, int i) throws SQLException {
+            return new Report(
                     resultSet.getInt("id"),
                     resultSet.getInt("layoutId"),
                     resultSet.getInt("userId"),
@@ -59,12 +59,12 @@ public class MySqlFormDaoImpl implements FormDAO {
         }
     }
 
-    public class LayoutRowMapper implements RowMapper<Layout> {
+    public class LayoutRowMapper implements RowMapper<Template> {
         @Override
-        public Layout mapRow(ResultSet resultSet, int i) throws SQLException {
+        public Template mapRow(ResultSet resultSet, int i) throws SQLException {
             final String sql = "SELECT COUNT(*) FROM Forms WHERE layoutid = ?";
 
-            return new Layout(
+            return new Template(
                    resultSet.getInt("id"),
                    resultSet.getString("title"),
                     jdbcTemplate.queryForObject(sql, Integer.class, resultSet.getInt("id"))
@@ -105,7 +105,7 @@ public class MySqlFormDaoImpl implements FormDAO {
 
     //METHODS
     @Override
-    public Collection<Form> getReports(Map<String, String> params) {
+    public Collection<Report> getReports(Map<String, String> params) {
         //String sql = "SELECT * FROM Forms" + this.paramsToSqlString(params);
 
         String sql = new SQLBuilder("SELECT * FROM Forms", params)
@@ -115,16 +115,16 @@ public class MySqlFormDaoImpl implements FormDAO {
                 .sqlPagination()
                 .getValue();
 
-        Collection<Form> forms = jdbcTemplate.query(sql, new FormRowMapper());
-        return forms;
+        Collection<Report> reports = jdbcTemplate.query(sql, new FormRowMapper());
+        return reports;
     }
 
     @Override
-    public Form getReportsById(int formId) {
+    public Report getReportsById(int formId) {
         final String sql = "SELECT * FROM Forms WHERE id = ?";
 
-        Form form = jdbcTemplate.queryForObject(sql, new FormRowMapper(), formId);
-        return form;
+        Report report = jdbcTemplate.queryForObject(sql, new FormRowMapper(), formId);
+        return report;
     }
 
     @Override
@@ -167,24 +167,24 @@ public class MySqlFormDaoImpl implements FormDAO {
     }
 
     @Override
-    public Collection<Layout> getTemplates(Map<String, String> params) {
+    public Collection<Template> getTemplates(Map<String, String> params) {
         final String sql = new SQLBuilder("SELECT * FROM Layouts", params)
                 .sqlSearch()
                 .sqlSort()
                 .sqlPagination()
                 .getValue();
 
-        Collection<Layout> layouts = jdbcTemplate.query(sql, new LayoutRowMapper());
+        Collection<Template> templates = jdbcTemplate.query(sql, new LayoutRowMapper());
 
-        return layouts;
+        return templates;
     }
 
     @Override
-    public Layout getTemplateById(int layoutid) {
+    public Template getTemplateById(int layoutid) {
         final String sql = "SELECT * FROM Layouts WHERE id = ?";
 
-        Layout layout = jdbcTemplate.queryForObject(sql, new LayoutRowMapper(), layoutid);
-        return layout;
+        Template template = jdbcTemplate.queryForObject(sql, new LayoutRowMapper(), layoutid);
+        return template;
     }
 
     @Override
@@ -263,7 +263,7 @@ public class MySqlFormDaoImpl implements FormDAO {
     }
 
     @Override
-    public Collection<Form> getReportsByUser(int id, Map<String, String> params) {
+    public Collection<Report> getReportsByUser(int id, Map<String, String> params) {
 
         final String sql = new SQLBuilder("SELECT * FROM Forms WHERE userId = ?", params)
                 .sqlWhere(new String[]{"layoutid"})
@@ -272,24 +272,24 @@ public class MySqlFormDaoImpl implements FormDAO {
                 .sqlSort()
                 .getValue();
 
-        Collection<Form> forms = jdbcTemplate.query(sql, new FormRowMapper(), id);
+        Collection<Report> reports = jdbcTemplate.query(sql, new FormRowMapper(), id);
 
-        return forms;
+        return reports;
     }
 
     @Override
-    public void createReport(int id, Form form) {
+    public void createReport(int id, Report report) {
         final String formSql = "INSERT INTO Forms (layoutId, userId, orderNo, title, dateCreated) VALUES (?,?,?,?,?)";
         //TODO fix this somehow!
         final String orderNoSql = "SELECT formCount FROM FormCounts WHERE layoutId = ?";
         final String formIdSql = "SELECT LAST_INSERT_ID()";
 
-        final int orderNo = jdbcTemplate.queryForObject(orderNoSql, Integer.class, form.getLayoutID()) + 1;
-        jdbcTemplate.update(formSql, form.getLayoutID(), id, orderNo, form.getTitle(), form.getDateCreated());
+        final int orderNo = jdbcTemplate.queryForObject(orderNoSql, Integer.class, report.getTemplateID()) + 1;
+        jdbcTemplate.update(formSql, report.getTemplateID(), id, orderNo, report.getTitle(), report.getDateCreated());
 
         final int formId = jdbcTemplate.queryForObject(formIdSql, Integer.class);
 
-        form.getAnswers().forEach(
+        report.getAnswers().forEach(
                 (ans) -> {
                     final String answerSql = "INSERT INTO FieldAnswers (fieldId, formId, answer) VALUES (?,?,?)";
                     jdbcTemplate.update(answerSql, ans.getFieldID(), formId, ans.getAnswer());
@@ -298,7 +298,7 @@ public class MySqlFormDaoImpl implements FormDAO {
     }
 
     @Override
-    public Collection<Layout> getTemplatesByUser(int id, Map<String, String> params) {
+    public Collection<Template> getTemplatesByUser(int id, Map<String, String> params) {
         //TODO Add parameter support
 
         final String sql = "SELECT * FROM Layouts WHERE id IN (:ids)";
@@ -306,20 +306,20 @@ public class MySqlFormDaoImpl implements FormDAO {
         final Collection<AccessRights> accessRights = this.getUserAccessRights(id);
 
         Set<Integer> ids = new HashSet();
-        accessRights.forEach((ar) -> ids.add(ar.getLayoutID()));
+        accessRights.forEach((ar) -> ids.add(ar.getTemplateID()));
 
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("ids", ids);
 
-        Collection<Layout> layouts;
+        Collection<Template> templates;
 
         try {
-             layouts = namedParameterJdbcTemplate.query(sql, parameters, new LayoutRowMapper());
+             templates = namedParameterJdbcTemplate.query(sql, parameters, new LayoutRowMapper());
         } catch(Exception e) {
             return null;
         }
 
-        return layouts;
+        return templates;
     }
 
     public int getUserIdByUsername(int id) {

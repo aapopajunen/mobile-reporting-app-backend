@@ -2,16 +2,16 @@ package com.swp.Entity;
 
 public class Field {
     private int ID;
-    private int layoutID;
+    private int templateID;
     private String title;
     private String defaultValue;
     private int typeID;
     private int orderNumber;
     private int required;
 
-    public Field(int ID, int layoutID, String title, String defaultValue, int typeID, int orderNumber, int required) {
+    public Field(int ID, int templateID, String title, String defaultValue, int typeID, int orderNumber, int required) {
         this.ID = ID;
-        this.layoutID = layoutID;
+        this.templateID = templateID;
         this.title = title;
         this.defaultValue = defaultValue;
         this.typeID = typeID;
@@ -23,8 +23,8 @@ public class Field {
         return ID;
     }
 
-    public int getLayoutID() {
-        return layoutID;
+    public int getTemplateID() {
+        return templateID;
     }
 
     public String getTitle() {

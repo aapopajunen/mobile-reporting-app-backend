@@ -2,12 +2,12 @@ package com.swp.Entity;
 
 public class FieldAnswer {
     private int fieldID;
-    private int formID;
+    private int reportID;
     private String answer;
 
-    public FieldAnswer(int fieldID, int formID, String answer) {
+    public FieldAnswer(int fieldID, int reportID, String answer) {
         this.fieldID = fieldID;
-        this.formID = formID;
+        this.reportID = reportID;
         this.answer = answer;
     }
 
@@ -18,8 +18,8 @@ public class FieldAnswer {
         return fieldID;
     }
 
-    public int getFormID() {
-        return formID;
+    public int getReportID() {
+        return reportID;
     }
 
     public String getAnswer() {
