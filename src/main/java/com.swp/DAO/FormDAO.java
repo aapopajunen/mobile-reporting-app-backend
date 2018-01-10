@@ -9,31 +9,31 @@ import java.util.Map;
 public interface FormDAO {
 
     // /forms
-    Collection<Form> getAllForms(Map<String, String> params);
+    Collection<Form> getReports(Map<String, String> params);
 
     // /forms/{formId}
-    Form getFormById(int formId);
+    Form getReportsById(int formId);
 
     // /forms/{formId}
-    void deleteFormById(int formId);
+    void deleteReportById(int formId);
 
     // /forms/{formId}
-    void acceptFormById(int formId);
+    void acceptReportById(int formId);
 
     // /forms/{formId}/fields
-    Collection<Field> getFieldsByFormId(int formId);
+    Collection<Field> getFieldsByReportId(int formId);
 
     // /forms/{formId}/answers
-    Collection<FieldAnswer> getAnswersByFormId(int formId);
+    Collection<FieldAnswer> getAnswersByReportId(int formId);
 
     // /layouts
-    Collection<Layout> getAllLayouts();
+    Collection<Layout> getTemplates(Map<String, String> params);
 
     // /layouts/{layoutid}
-    Layout getLayoutById(int layoutid);
+    Layout getTemplateById(int layoutid);
 
     // /layouts/{layoutid}/fields
-    Collection<Field> getFieldsByLayoutId(int layoutId);
+    Collection<Field> getFieldsByTemplateId(int layoutId);
 
     // /users
     Collection<User> getAllUsers();
@@ -60,13 +60,13 @@ public interface FormDAO {
     void deleteUserAccessRights(int id, Map<String, String> params);
 
     // /users/{id}/forms
-    Collection<Form> getFormsByUser(int id, Map<String,String> params);
+    Collection<Form> getReportsByUser(int id, Map<String,String> params);
 
     // /users/{id}/forms
-    void createForm(int id, Form form);
+    void createReport(int id, Form form);
 
     // /users/{id}/forms
-    Collection<Layout> getLayoutsByUser(int id, Map<String, String> params);
+    Collection<Layout> getTemplatesByUser(int id, Map<String, String> params);
 
 
 }

@@ -11,7 +11,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import javax.swing.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -40,7 +39,7 @@ public class MySqlFormDaoImpl implements FormDAO {
                     resultSet.getString("title"),
                     resultSet.getDate("dateCreated"),
                     resultSet.getDate("dateAccepted"),
-                    getAnswersByFormId(resultSet.getInt("id"))
+                    getAnswersByReportId(resultSet.getInt("id"))
             );
         }
     }
@@ -106,15 +105,22 @@ public class MySqlFormDaoImpl implements FormDAO {
 
     //METHODS
     @Override
-    public Collection<Form> getAllForms(Map<String, String> params) {
-        String sql = "SELECT * FROM Forms" + this.paramsToSqlString(params);
+    public Collection<Form> getReports(Map<String, String> params) {
+        //String sql = "SELECT * FROM Forms" + this.paramsToSqlString(params);
+
+        String sql = new SQLBuilder("SELECT * FROM Forms", params)
+                .sqlWhere(new String[]{"layoutid", "userid"})
+                .sqlSearch()
+                .sqlSort()
+                .sqlPagination()
+                .getValue();
 
         Collection<Form> forms = jdbcTemplate.query(sql, new FormRowMapper());
         return forms;
     }
 
     @Override
-    public Form getFormById(int formId) {
+    public Form getReportsById(int formId) {
         final String sql = "SELECT * FROM Forms WHERE id = ?";
 
         Form form = jdbcTemplate.queryForObject(sql, new FormRowMapper(), formId);
@@ -122,7 +128,7 @@ public class MySqlFormDaoImpl implements FormDAO {
     }
 
     @Override
-    public void deleteFormById(int formId) {
+    public void deleteReportById(int formId) {
         final String formDeleteSql = "DELETE FROM Forms WHERE id = ?";
 
         final String answersDeleteSql = "DELETE FROM FieldAnswers WHERE formID = ?";
@@ -132,14 +138,14 @@ public class MySqlFormDaoImpl implements FormDAO {
     }
 
     @Override
-    public void acceptFormById(int formId) {
+    public void acceptReportById(int formId) {
         final String sql = "UPDATE Forms SET dateAccepted = CURRENT_DATE () WHERE ID = ?";
 
         jdbcTemplate.update(sql, formId);
     }
 
     @Override
-    public Collection<Field> getFieldsByFormId(int formId) {
+    public Collection<Field> getFieldsByReportId(int formId) {
         final String layoutIdSql = "SELECT layoutid FROM Forms WHERE id = ?";
 
         int layoutId = jdbcTemplate.queryForObject(layoutIdSql, Integer.class, formId);
@@ -152,7 +158,7 @@ public class MySqlFormDaoImpl implements FormDAO {
     }
 
     @Override
-    public Collection<FieldAnswer> getAnswersByFormId(int formId) {
+    public Collection<FieldAnswer> getAnswersByReportId(int formId) {
         final String sql = "SELECT * FROM FieldAnswers WHERE formID = ?";
 
         Collection<FieldAnswer> answers = jdbcTemplate.query(sql, new FieldAnswerRowMapper(), formId);
@@ -161,8 +167,12 @@ public class MySqlFormDaoImpl implements FormDAO {
     }
 
     @Override
-    public Collection<Layout> getAllLayouts() {
-        final String sql = "SELECT * FROM Layouts";
+    public Collection<Layout> getTemplates(Map<String, String> params) {
+        final String sql = new SQLBuilder("SELECT * FROM Layouts", params)
+                .sqlSearch()
+                .sqlSort()
+                .sqlPagination()
+                .getValue();
 
         Collection<Layout> layouts = jdbcTemplate.query(sql, new LayoutRowMapper());
 
@@ -170,7 +180,7 @@ public class MySqlFormDaoImpl implements FormDAO {
     }
 
     @Override
-    public Layout getLayoutById(int layoutid) {
+    public Layout getTemplateById(int layoutid) {
         final String sql = "SELECT * FROM Layouts WHERE id = ?";
 
         Layout layout = jdbcTemplate.queryForObject(sql, new LayoutRowMapper(), layoutid);
@@ -178,7 +188,7 @@ public class MySqlFormDaoImpl implements FormDAO {
     }
 
     @Override
-    public Collection<Field> getFieldsByLayoutId(int layoutId) {
+    public Collection<Field> getFieldsByTemplateId(int layoutId) {
         final String sql = "SELECT * FROM Fields WHERE layoutid = ?";
 
         Collection<Field> fields = jdbcTemplate.query(sql, new FieldRowMapper(), layoutId);
@@ -253,10 +263,14 @@ public class MySqlFormDaoImpl implements FormDAO {
     }
 
     @Override
-    public Collection<Form> getFormsByUser(int id, Map<String, String> params) {
-        //TODO Add parameter support
+    public Collection<Form> getReportsByUser(int id, Map<String, String> params) {
 
-        final String sql = "SELECT * FROM Forms WHERE userId = ?" + this.paramsToSqlString(params);
+        final String sql = new SQLBuilder("SELECT * FROM Forms WHERE userId = ?", params)
+                .sqlWhere(new String[]{"layoutid"})
+                .sqlSearch()
+                .sqlPagination()
+                .sqlSort()
+                .getValue();
 
         Collection<Form> forms = jdbcTemplate.query(sql, new FormRowMapper(), id);
 
@@ -264,7 +278,7 @@ public class MySqlFormDaoImpl implements FormDAO {
     }
 
     @Override
-    public void createForm(int id, Form form) {
+    public void createReport(int id, Form form) {
         final String formSql = "INSERT INTO Forms (layoutId, userId, orderNo, title, dateCreated) VALUES (?,?,?,?,?)";
         //TODO fix this somehow!
         final String orderNoSql = "SELECT formCount FROM FormCounts WHERE layoutId = ?";
@@ -284,7 +298,7 @@ public class MySqlFormDaoImpl implements FormDAO {
     }
 
     @Override
-    public Collection<Layout> getLayoutsByUser(int id, Map<String, String> params) {
+    public Collection<Layout> getTemplatesByUser(int id, Map<String, String> params) {
         //TODO Add parameter support
 
         final String sql = "SELECT * FROM Layouts WHERE id IN (:ids)";
@@ -350,6 +364,94 @@ public class MySqlFormDaoImpl implements FormDAO {
 
 
         return sql;
+    }
+
+    public class SQLBuilder {
+
+        private String value;
+        private Map<String, String> params;
+
+        public SQLBuilder(String value, Map<String, String> params) {
+            this.value = value;
+            this.params = params;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+
+        //WHERE, SEARCH, SORT, PAGE
+
+        public SQLBuilder sqlWhere(String[] columns) {
+            List<String> temp = new ArrayList<String>();
+
+            for(String column : columns) {
+                if(params.containsKey(column)) {
+                    temp.add(column + " = " + params.get(column));
+                }
+            }
+
+            if(!temp.isEmpty()) {
+                this.setValue(this.getValue() + " WHERE " + String.join(" AND " ,temp));
+            }
+
+            return this;
+        }
+
+        public SQLBuilder sqlPagination() {
+            int pageSize = 20;
+
+            if(params.containsKey("pagesize")) {
+                pageSize = Integer.valueOf(params.get("pagesize"));
+            }
+
+            if(params.containsKey("page")) {
+                String[] pages = params.get("page").split(",");
+
+                if(pages.length == 2){
+                    int startPage = Integer.parseInt(pages[0]) - 1;
+                    int endPage = Integer.parseInt(pages[1]);
+                    this.setValue(this.getValue() + " LIMIT " + startPage*pageSize + "," + (endPage - startPage)*pageSize);
+                }
+
+                if(pages.length == 1){
+                    int page = Integer.parseInt(pages[0]) - 1;
+                    this.setValue(this.getValue() + " LIMIT " + page*pageSize + "," + pageSize);
+                }
+            }
+
+            return this;
+        }
+
+        public SQLBuilder sqlSearch() {
+            String[] searchParams = null;
+
+            if(params.containsKey("search")){
+                searchParams = params.get("search").split(",");
+            }
+
+            if(searchParams != null && searchParams.length == 2){
+                this.setValue("SELECT * FROM (" + this.getValue() + ") AS Temp WHERE " + searchParams[0] + " LIKE " + "\"%" + searchParams[1] + "%\"");
+            }
+
+            return this;
+        }
+
+        public SQLBuilder sqlSort() {
+            if(params.containsKey("sort")) {
+                this.setValue(this.getValue() + " ORDER BY " + "(" + params.get("sort") + ")");
+            }
+
+            return this;
+        }
+
+
+
     }
 }
 

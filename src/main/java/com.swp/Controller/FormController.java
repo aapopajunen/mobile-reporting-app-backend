@@ -18,49 +18,49 @@ public class FormController {
     @Qualifier("mysql")
     private FormDAO formDAO;
 
-    @RequestMapping(value = "/forms", method = RequestMethod.GET)
-    public Collection<Form> getAllForms(@RequestParam Map<String, String> params) {
-        return formDAO.getAllForms(params);
+    @RequestMapping(value = "/reports", method = RequestMethod.GET)
+    public Collection<Form> getAllReports(@RequestParam Map<String, String> params) {
+        return formDAO.getReports(params);
     }
 
-    @RequestMapping(value = "/forms/{id}", method = RequestMethod.GET)
-    public Form getFormById(@PathVariable int id) {
-        return formDAO.getFormById(id);
+    @RequestMapping(value = "/reports/{id}", method = RequestMethod.GET)
+    public Form getReportById(@PathVariable int id) {
+        return formDAO.getReportsById(id);
     }
 
-    @RequestMapping(value = "/forms/{id}", method = RequestMethod.DELETE)
-    public void deleteFormById(@PathVariable int id) {
-        formDAO.deleteFormById(id);
+    @RequestMapping(value = "/reports/{id}", method = RequestMethod.DELETE)
+    public void deleteReportById(@PathVariable int id) {
+        formDAO.deleteReportById(id);
     }
 
-    @RequestMapping(value = "/forms/{id}", method = RequestMethod.PUT)
-    public void acceptFormById(@PathVariable int id) {
-        formDAO.acceptFormById(id);
+    @RequestMapping(value = "/reports/{id}", method = RequestMethod.PUT)
+    public void acceptReportById(@PathVariable int id) {
+        formDAO.acceptReportById(id);
     }
 
-    @RequestMapping(value = "/forms/{id}/fields", method = RequestMethod.GET)
-    public Collection<Field> getFieldsByFormId(@PathVariable("id") int formId) {
-        return formDAO.getFieldsByFormId(formId);
+    @RequestMapping(value = "/reports/{id}/fields", method = RequestMethod.GET)
+    public Collection<Field> getFieldsByReportId(@PathVariable("id") int formId) {
+        return formDAO.getFieldsByReportId(formId);
     }
 
-    @RequestMapping(value = "/forms/{id}/answers", method = RequestMethod.GET)
-    public Collection<FieldAnswer> getAnswersByFormId(@PathVariable("id") int formId) {
-        return formDAO.getAnswersByFormId(formId);
+    @RequestMapping(value = "/reports/{id}/answers", method = RequestMethod.GET)
+    public Collection<FieldAnswer> getAnswersByReportId(@PathVariable("id") int formId) {
+        return formDAO.getAnswersByReportId(formId);
     }
 
-    @RequestMapping(value = "/layouts", method = RequestMethod.GET)
-    public Collection<Layout> getAllLayouts() {
-       return formDAO.getAllLayouts();
+    @RequestMapping(value = "/templates", method = RequestMethod.GET)
+    public Collection<Layout> getAllTemplates(@RequestParam Map<String, String> params) {
+       return formDAO.getTemplates(params);
     }
 
-    @RequestMapping(value = "/layouts/{id}", method = RequestMethod.GET)
-    public Layout getLayoutById(@PathVariable("id") int formId) {
-        return formDAO.getLayoutById(formId);
+    @RequestMapping(value = "/templates/{id}", method = RequestMethod.GET)
+    public Layout getTemplateById(@PathVariable("id") int formId) {
+        return formDAO.getTemplateById(formId);
     }
 
-    @RequestMapping(value = "/layouts/{id}/fields", method = RequestMethod.GET)
-    public Collection<Field> getFieldsByLayoutId(@PathVariable("id") int layoutId) {
-        return formDAO.getFieldsByLayoutId(layoutId);
+    @RequestMapping(value = "/templates/{id}/fields", method = RequestMethod.GET)
+    public Collection<Field> getFieldsByTemplateId(@PathVariable("id") int layoutId) {
+        return formDAO.getFieldsByTemplateId(layoutId);
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
@@ -105,24 +105,23 @@ public class FormController {
         formDAO.deleteUserAccessRights(id, params);
     }
 
-    @RequestMapping(value = "/users/{id}/forms", method = RequestMethod.GET)
-    public Collection<Form> getFormsByUser(
+    @RequestMapping(value = "/users/{id}/reports", method = RequestMethod.GET)
+    public Collection<Form> getReportsByUser(
             @PathVariable("id") int id,
             @RequestParam Map<String, String> params) {
-        return formDAO.getFormsByUser(id, params);
+        return formDAO.getReportsByUser(id, params);
     }
 
-    @RequestMapping(value = "/users/{id}/forms", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void createForm(@PathVariable int id, @RequestBody Form form) {
-        formDAO.createForm(id, form);
+    @RequestMapping(value = "/users/{id}/reports", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void createReport(@PathVariable int id, @RequestBody Form form) {
+        formDAO.createReport(id, form);
     }
 
-    @RequestMapping(value = "/users/{id}/layouts", method = RequestMethod.GET)
-    public Collection<Layout> getLayoutsByUser(
+    @RequestMapping(value = "/users/{id}/templates", method = RequestMethod.GET)
+    public Collection<Layout> getTemplatesByUser(
             @PathVariable("id") int id,
             @RequestParam Map<String, String> params) {
-
-        return formDAO.getLayoutsByUser(id, params);
+        return formDAO.getTemplatesByUser(id, params);
     }
 
 }
