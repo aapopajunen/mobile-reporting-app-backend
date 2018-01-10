@@ -33,7 +33,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
         public Report mapRow(ResultSet resultSet, int i) throws SQLException {
             return new Report(
                     resultSet.getInt("id"),
-                    resultSet.getInt("layoutId"),
+                    resultSet.getInt("templateId"),
                     resultSet.getInt("userId"),
                     resultSet.getInt("orderNo"),
                     resultSet.getString("title"),
@@ -49,7 +49,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
         public Field mapRow(ResultSet resultSet, int i) throws SQLException {
             return new Field(
                     resultSet.getInt("id"),
-                    resultSet.getInt("layoutId"),
+                    resultSet.getInt("templateId"),
                     resultSet.getString("title"),
                     resultSet.getString("defaultValue"),
                     resultSet.getInt("typeID"),
@@ -62,7 +62,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
     public class LayoutRowMapper implements RowMapper<Template> {
         @Override
         public Template mapRow(ResultSet resultSet, int i) throws SQLException {
-            final String sql = "SELECT COUNT(*) FROM Forms WHERE layoutid = ?";
+            final String sql = "SELECT COUNT(*) FROM Reports WHERE templateid = ?";
 
             return new Template(
                    resultSet.getInt("id"),
@@ -77,7 +77,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
         public FieldAnswer mapRow(ResultSet resultSet, int i) throws SQLException {
             return new FieldAnswer(
                     resultSet.getInt("fieldId"),
-                    resultSet.getInt("formId"),
+                    resultSet.getInt("reportId"),
                     resultSet.getString("answer")
             );
         }
@@ -98,7 +98,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
         public AccessRights mapRow(ResultSet resultSet, int i) throws SQLException {
             return new AccessRights(
                     resultSet.getInt("userId"),
-                    resultSet.getInt("layoutId")
+                    resultSet.getInt("templateId")
             );
         }
     }
@@ -106,10 +106,10 @@ public class MySqlReportDaoImpl implements ReportDAO {
     //METHODS
     @Override
     public Collection<Report> getReports(Map<String, String> params) {
-        //String sql = "SELECT * FROM Forms" + this.paramsToSqlString(params);
+        //String sql = "SELECT * FROM Reports" + this.paramsToSqlString(params);
 
-        String sql = new SQLBuilder("SELECT * FROM Forms", params)
-                .sqlWhere(new String[]{"layoutid", "userid"})
+        String sql = new SQLBuilder("SELECT * FROM Reports", params)
+                .sqlWhere(new String[]{"templateid", "userid"})
                 .sqlSearch()
                 .sqlSort()
                 .sqlPagination()
@@ -120,55 +120,55 @@ public class MySqlReportDaoImpl implements ReportDAO {
     }
 
     @Override
-    public Report getReportsById(int formId) {
-        final String sql = "SELECT * FROM Forms WHERE id = ?";
+    public Report getReportsById(int reportId) {
+        final String sql = "SELECT * FROM Reports WHERE id = ?";
 
-        Report report = jdbcTemplate.queryForObject(sql, new FormRowMapper(), formId);
+        Report report = jdbcTemplate.queryForObject(sql, new FormRowMapper(), reportId);
         return report;
     }
 
     @Override
-    public void deleteReportById(int formId) {
-        final String formDeleteSql = "DELETE FROM Forms WHERE id = ?";
+    public void deleteReportById(int reportId) {
+        final String reportDeleteSql = "DELETE FROM Reports WHERE id = ?";
 
-        final String answersDeleteSql = "DELETE FROM FieldAnswers WHERE formID = ?";
+        final String answersDeleteSql = "DELETE FROM FieldAnswers WHERE reportID = ?";
 
-        jdbcTemplate.update(answersDeleteSql, formId);
-        jdbcTemplate.update(formDeleteSql, formId);
+        jdbcTemplate.update(answersDeleteSql, reportId);
+        jdbcTemplate.update(reportDeleteSql, reportId);
     }
 
     @Override
-    public void acceptReportById(int formId) {
-        final String sql = "UPDATE Forms SET dateAccepted = CURRENT_DATE () WHERE ID = ?";
+    public void acceptReportById(int reportId) {
+        final String sql = "UPDATE Reports SET dateAccepted = CURRENT_DATE () WHERE ID = ?";
 
-        jdbcTemplate.update(sql, formId);
+        jdbcTemplate.update(sql, reportId);
     }
 
     @Override
-    public Collection<Field> getFieldsByReportId(int formId) {
-        final String layoutIdSql = "SELECT layoutid FROM Forms WHERE id = ?";
+    public Collection<Field> getFieldsByReportId(int reportId) {
+        final String templateIdSql = "SELECT templateid FROM Reports WHERE id = ?";
 
-        int layoutId = jdbcTemplate.queryForObject(layoutIdSql, Integer.class, formId);
+        int templateId = jdbcTemplate.queryForObject(templateIdSql, Integer.class, reportId);
 
-        final String sql = "SELECT * FROM Fields WHERE layoutid = ? ORDER BY orderNumber";
+        final String sql = "SELECT * FROM Fields WHERE templateid = ? ORDER BY orderNumber";
 
-        Collection<Field> fields = jdbcTemplate.query(sql, new FieldRowMapper(), layoutId);
+        Collection<Field> fields = jdbcTemplate.query(sql, new FieldRowMapper(), templateId);
 
         return fields;
     }
 
     @Override
-    public Collection<FieldAnswer> getAnswersByReportId(int formId) {
-        final String sql = "SELECT * FROM FieldAnswers WHERE formID = ?";
+    public Collection<FieldAnswer> getAnswersByReportId(int reportId) {
+        final String sql = "SELECT * FROM FieldAnswers WHERE reportID = ?";
 
-        Collection<FieldAnswer> answers = jdbcTemplate.query(sql, new FieldAnswerRowMapper(), formId);
+        Collection<FieldAnswer> answers = jdbcTemplate.query(sql, new FieldAnswerRowMapper(), reportId);
 
         return answers;
     }
 
     @Override
     public Collection<Template> getTemplates(Map<String, String> params) {
-        final String sql = new SQLBuilder("SELECT * FROM Layouts", params)
+        final String sql = new SQLBuilder("SELECT * FROM Templates", params)
                 .sqlSearch()
                 .sqlSort()
                 .sqlPagination()
@@ -180,18 +180,18 @@ public class MySqlReportDaoImpl implements ReportDAO {
     }
 
     @Override
-    public Template getTemplateById(int layoutid) {
-        final String sql = "SELECT * FROM Layouts WHERE id = ?";
+    public Template getTemplateById(int templateid) {
+        final String sql = "SELECT * FROM Templates WHERE id = ?";
 
-        Template template = jdbcTemplate.queryForObject(sql, new LayoutRowMapper(), layoutid);
+        Template template = jdbcTemplate.queryForObject(sql, new LayoutRowMapper(), templateid);
         return template;
     }
 
     @Override
-    public Collection<Field> getFieldsByTemplateId(int layoutId) {
-        final String sql = "SELECT * FROM Fields WHERE layoutid = ?";
+    public Collection<Field> getFieldsByTemplateId(int templateId) {
+        final String sql = "SELECT * FROM Fields WHERE templateid = ?";
 
-        Collection<Field> fields = jdbcTemplate.query(sql, new FieldRowMapper(), layoutId);
+        Collection<Field> fields = jdbcTemplate.query(sql, new FieldRowMapper(), templateId);
 
         return fields;
     }
@@ -246,27 +246,27 @@ public class MySqlReportDaoImpl implements ReportDAO {
 
     @Override
     public void grantUserAccessRights(int id, Map<String, String> params) {
-        final String sql = "INSERT INTO AccessRights (userID, layoutID) VALUES (?,?)";
+        final String sql = "INSERT INTO AccessRights (userID, templateID) VALUES (?,?)";
 
-        if(params.containsKey("layoutid")) {
-            jdbcTemplate.update(sql, id, params.get("layoutid"));
+        if(params.containsKey("templateid")) {
+            jdbcTemplate.update(sql, id, params.get("templateid"));
         }
     }
 
     @Override
     public void deleteUserAccessRights(int id, Map<String, String> params) {
-        final String sql = "DELETE FROM AccessRights WHERE userid = ? AND layoutid = ?";
+        final String sql = "DELETE FROM AccessRights WHERE userid = ? AND templateid = ?";
 
-        if(params.containsKey("layoutid")) {
-            jdbcTemplate.update(sql, id, params.get("layoutid"));
+        if(params.containsKey("templateid")) {
+            jdbcTemplate.update(sql, id, params.get("templateid"));
         }
     }
 
     @Override
     public Collection<Report> getReportsByUser(int id, Map<String, String> params) {
 
-        final String sql = new SQLBuilder("SELECT * FROM Forms WHERE userId = ?", params)
-                .sqlWhere(new String[]{"layoutid"})
+        final String sql = new SQLBuilder("SELECT * FROM Reports WHERE userId = ?", params)
+                .sqlWhere(new String[]{"templateid"})
                 .sqlSearch()
                 .sqlPagination()
                 .sqlSort()
@@ -279,20 +279,20 @@ public class MySqlReportDaoImpl implements ReportDAO {
 
     @Override
     public void createReport(int id, Report report) {
-        final String formSql = "INSERT INTO Forms (layoutId, userId, orderNo, title, dateCreated) VALUES (?,?,?,?,?)";
+        final String reportSql = "INSERT INTO Reports (templateId, userId, orderNo, title, dateCreated) VALUES (?,?,?,?,?)";
         //TODO fix this somehow!
-        final String orderNoSql = "SELECT formCount FROM FormCounts WHERE layoutId = ?";
-        final String formIdSql = "SELECT LAST_INSERT_ID()";
+        final String orderNoSql = "SELECT reportCount FROM ReportCounts WHERE templateId = ?";
+        final String reportIdSql = "SELECT LAST_INSERT_ID()";
 
         final int orderNo = jdbcTemplate.queryForObject(orderNoSql, Integer.class, report.getTemplateID()) + 1;
-        jdbcTemplate.update(formSql, report.getTemplateID(), id, orderNo, report.getTitle(), report.getDateCreated());
+        jdbcTemplate.update(reportSql, report.getTemplateID(), id, orderNo, report.getTitle(), report.getDateCreated());
 
-        final int formId = jdbcTemplate.queryForObject(formIdSql, Integer.class);
+        final int reportId = jdbcTemplate.queryForObject(reportIdSql, Integer.class);
 
         report.getAnswers().forEach(
                 (ans) -> {
-                    final String answerSql = "INSERT INTO FieldAnswers (fieldId, formId, answer) VALUES (?,?,?)";
-                    jdbcTemplate.update(answerSql, ans.getFieldID(), formId, ans.getAnswer());
+                    final String answerSql = "INSERT INTO FieldAnswers (fieldId, reportId, answer) VALUES (?,?,?)";
+                    jdbcTemplate.update(answerSql, ans.getFieldID(), reportId, ans.getAnswer());
                 }
         );
     }
@@ -301,7 +301,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
     public Collection<Template> getTemplatesByUser(int id, Map<String, String> params) {
         //TODO Add parameter support
 
-        final String sql = "SELECT * FROM Layouts WHERE id IN (:ids)";
+        final String sql = "SELECT * FROM Templates WHERE id IN (:ids)";
 
         final Collection<AccessRights> accessRights = this.getUserAccessRights(id);
 
@@ -339,8 +339,8 @@ public class MySqlReportDaoImpl implements ReportDAO {
             pageSize = Integer.valueOf(params.get("pagesize"));
         }
 
-        if(params.containsKey("layoutid")) {
-            sql = " WHERE layoutid = " + params.get("layoutid");
+        if(params.containsKey("templateid")) {
+            sql = " WHERE templateid = " + params.get("templateid");
         }
 
         if(params.containsKey("sort")) {

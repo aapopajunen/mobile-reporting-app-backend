@@ -54,13 +54,13 @@ public class ReportController {
     }
 
     @RequestMapping(value = "/templates/{id}", method = RequestMethod.GET)
-    public Template getTemplateById(@PathVariable("id") int formId) {
-        return reportDAO.getTemplateById(formId);
+    public Template getTemplateById(@PathVariable("id") int templateId) {
+        return reportDAO.getTemplateById(templateId);
     }
 
     @RequestMapping(value = "/templates/{id}/fields", method = RequestMethod.GET)
-    public Collection<Field> getFieldsByTemplateId(@PathVariable("id") int layoutId) {
-        return reportDAO.getFieldsByTemplateId(layoutId);
+    public Collection<Field> getFieldsByTemplateId(@PathVariable("id") int templateId) {
+        return reportDAO.getFieldsByTemplateId(templateId);
     }
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
