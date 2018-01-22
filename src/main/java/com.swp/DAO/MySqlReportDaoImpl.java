@@ -62,12 +62,13 @@ public class MySqlReportDaoImpl implements ReportDAO {
     public class LayoutRowMapper implements RowMapper<Template> {
         @Override
         public Template mapRow(ResultSet resultSet, int i) throws SQLException {
-            final String sql = "SELECT COUNT(*) FROM Reports WHERE templateid = ?";
+            final String amountOdReportsSql = "SELECT COUNT(*) FROM Reports WHERE templateid = ?";
 
             return new Template(
                    resultSet.getInt("id"),
                    resultSet.getString("title"),
-                    jdbcTemplate.queryForObject(sql, Integer.class, resultSet.getInt("id"))
+                    resultSet.getInt("reportCount"),
+                    jdbcTemplate.queryForObject(amountOdReportsSql, Integer.class, resultSet.getInt("id"))
             );
         }
     }
@@ -180,10 +181,10 @@ public class MySqlReportDaoImpl implements ReportDAO {
     }
 
     @Override
-    public Template getTemplateById(int templateid) {
+    public Template getTemplateById(int templateId) {
         final String sql = "SELECT * FROM Templates WHERE id = ?";
 
-        Template template = jdbcTemplate.queryForObject(sql, new LayoutRowMapper(), templateid);
+        Template template = jdbcTemplate.queryForObject(sql, new LayoutRowMapper(), templateId);
         return template;
     }
 
@@ -280,8 +281,9 @@ public class MySqlReportDaoImpl implements ReportDAO {
     @Override
     public void createReport(int id, Report report) {
         final String reportSql = "INSERT INTO Reports (templateId, userId, orderNo, title, dateCreated) VALUES (?,?,?,?,?)";
-        //TODO fix this somehow!
-        final String orderNoSql = "SELECT reportCount FROM ReportCounts WHERE templateId = ?";
+
+        final String orderNoSql = "SELECT reportCount FROM Templates WHERE id = ?";
+
         final String reportIdSql = "SELECT LAST_INSERT_ID()";
 
         final int orderNo = jdbcTemplate.queryForObject(orderNoSql, Integer.class, report.getTemplateID()) + 1;

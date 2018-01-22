@@ -10,29 +10,29 @@ public interface ReportDAO {
     // /forms
     Collection<Report> getReports(Map<String, String> params);
 
-    // /forms/{formId}
-    Report getReportsById(int formId);
+    // /forms/{reportId}
+    Report getReportsById(int reportId);
 
-    // /forms/{formId}
-    void deleteReportById(int formId);
+    // /forms/{reportId}
+    void deleteReportById(int reportId);
 
-    // /forms/{formId}
-    void acceptReportById(int formId);
+    // /forms/{reportId}
+    void acceptReportById(int reportId);
 
-    // /forms/{formId}/fields
-    Collection<Field> getFieldsByReportId(int formId);
+    // /forms/{reportId}/fields
+    Collection<Field> getFieldsByReportId(int reportId);
 
-    // /forms/{formId}/answers
-    Collection<FieldAnswer> getAnswersByReportId(int formId);
+    // /forms/{reportId}/answers
+    Collection<FieldAnswer> getAnswersByReportId(int reportId);
 
     // /layouts
     Collection<Template> getTemplates(Map<String, String> params);
 
-    // /layouts/{layoutid}
-    Template getTemplateById(int layoutid);
+    // /layouts/{templateId}
+    Template getTemplateById(int templateId);
 
     // /layouts/{layoutid}/fields
-    Collection<Field> getFieldsByTemplateId(int layoutId);
+    Collection<Field> getFieldsByTemplateId(int templateId);
 
     // /users
     Collection<User> getAllUsers();
