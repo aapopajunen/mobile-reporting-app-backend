@@ -248,7 +248,7 @@ public class ReportController {
 
 
     /**
-     * This function is used for creating a new report. The form is created based on the
+     * This function is used for creating a new report. The report is created based on the
      * information provided in the json.
      *
      * @param id
