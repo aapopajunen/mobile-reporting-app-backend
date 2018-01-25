@@ -7,31 +7,31 @@ import java.util.Map;
 
 public interface ReportDAO {
 
-    // /forms
+    // /reports
     Collection<Report> getReports(Map<String, String> params);
 
-    // /forms/{reportId}
+    // /reports/{reportId}
     Report getReportsById(int reportId);
 
-    // /forms/{reportId}
+    // /reports/{reportId}
     void deleteReportById(int reportId);
 
-    // /forms/{reportId}
+    // /reports/{reportId}
     void acceptReportById(int reportId);
 
-    // /forms/{reportId}/fields
+    // /reports/{reportId}/fields
     Collection<Field> getFieldsByReportId(int reportId);
 
-    // /forms/{reportId}/answers
+    // /reports/{reportId}/answers
     Collection<FieldAnswer> getAnswersByReportId(int reportId);
 
-    // /layouts
+    // /templates
     Collection<Template> getTemplates(Map<String, String> params);
 
-    // /layouts/{templateId}
+    // /templates/{templateId}
     Template getTemplateById(int templateId);
 
-    // /layouts/{layoutid}/fields
+    // /templates/{templateId}/fields
     Collection<Field> getFieldsByTemplateId(int templateId);
 
     // /users
@@ -58,13 +58,13 @@ public interface ReportDAO {
     // /users/{id}/rights
     void deleteUserAccessRights(int id, Map<String, String> params);
 
-    // /users/{id}/forms
+    // /users/{id}/reports
     Collection<Report> getReportsByUser(int id, Map<String,String> params);
 
-    // /users/{id}/forms
+    // /users/{id}/reports
     void createReport(int id, Report report);
 
-    // /users/{id}/forms
+    // /users/{id}/reports
     Collection<Template> getTemplatesByUser(int id, Map<String, String> params);
 
 
