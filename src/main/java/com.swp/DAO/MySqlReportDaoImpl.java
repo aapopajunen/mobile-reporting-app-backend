@@ -99,6 +99,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
         public AccessRights mapRow(ResultSet resultSet, int i) throws SQLException {
             return new AccessRights(
                     resultSet.getInt("userId"),
+                    resultSet.getString("username"),
                     resultSet.getInt("templateId")
             );
         }
@@ -237,57 +238,64 @@ public class MySqlReportDaoImpl implements ReportDAO {
     }
 
     @Override
-    public Collection<AccessRights> getUserAccessRights(int id) {
-        final String sql = "SELECT * FROM AccessRights WHERE userid = ?";
+    public Collection<AccessRights> getUserAccessRights(String username) {
+        final String sql = "SELECT * FROM AccessRights WHERE username = ?";
 
-        Collection<AccessRights> accessRights = jdbcTemplate.query(sql, new AccessRightsRowMapper(), id);
+        Collection<AccessRights> accessRights = jdbcTemplate.query(sql, new AccessRightsRowMapper(), username);
 
         return accessRights;
     }
 
     @Override
-    public void grantUserAccessRights(int id, Map<String, String> params) {
-        final String sql = "INSERT INTO AccessRights (userID, templateID) VALUES (?,?)";
+    public void grantUserAccessRights(String username, Map<String, String> params) {
+        final String sql = "INSERT INTO AccessRights (username, templateID) VALUES (?,?)";
 
         if(params.containsKey("templateid")) {
-            jdbcTemplate.update(sql, id, params.get("templateid"));
+            jdbcTemplate.update(sql, username, params.get("templateid"));
         }
     }
 
     @Override
-    public void deleteUserAccessRights(int id, Map<String, String> params) {
-        final String sql = "DELETE FROM AccessRights WHERE userid = ? AND templateid = ?";
+    public void deleteUserAccessRights(String username, Map<String, String> params) {
+        final String sql = "DELETE FROM AccessRights WHERE username = ? AND templateid = ?";
 
         if(params.containsKey("templateid")) {
-            jdbcTemplate.update(sql, id, params.get("templateid"));
+            jdbcTemplate.update(sql, username, params.get("templateid"));
         }
     }
 
     @Override
-    public Collection<Report> getReportsByUser(int id, Map<String, String> params) {
+    public Collection<Report> getReportsByUser(String username, Map<String, String> params) {
 
-        final String sql = new SQLBuilder("SELECT * FROM Reports WHERE userId = ?", params)
+        final String sql = new SQLBuilder("SELECT * FROM Reports WHERE username = ?", params)
                 .sqlWhere(new String[]{"templateid"})
                 .sqlSearch()
                 .sqlPagination()
                 .sqlSort()
                 .getValue();
 
-        Collection<Report> reports = jdbcTemplate.query(sql, new FormRowMapper(), id);
+        Collection<Report> reports = jdbcTemplate.query(sql, new FormRowMapper(), username);
 
         return reports;
     }
 
     @Override
-    public void createReport(int id, Report report) {
-        final String reportSql = "INSERT INTO Reports (templateId, userId, orderNo, title, dateCreated) VALUES (?,?,?,?,?)";
+    public Report getUsersReportById(String username, int reportId) {
+        final String sql = "SELECT * FROM Reports AS R JOIN Users AS U ON U.username = R.username AND U.username = ? AND R.ID = ?";
+        Report report = jdbcTemplate.queryForObject(sql, new FormRowMapper(), username, reportId);
+        return report;
+    }
+
+    @Override
+    public void createReport(String username, Report report) {
+        final String reportSql = "INSERT INTO Reports (templateId, username, orderNo, title, dateCreated) VALUES (?,?,?,?,?)";
 
         final String orderNoSql = "SELECT reportCount FROM Templates WHERE id = ?";
 
         final String reportIdSql = "SELECT LAST_INSERT_ID()";
 
         final int orderNo = jdbcTemplate.queryForObject(orderNoSql, Integer.class, report.getTemplateID()) + 1;
-        jdbcTemplate.update(reportSql, report.getTemplateID(), id, orderNo, report.getTitle(), report.getDateCreated());
+        jdbcTemplate.update(reportSql, report.getTemplateID(), username, orderNo, report.getTitle(), report.getDateCreated());
 
         final int reportId = jdbcTemplate.queryForObject(reportIdSql, Integer.class);
 
@@ -300,12 +308,12 @@ public class MySqlReportDaoImpl implements ReportDAO {
     }
 
     @Override
-    public Collection<Template> getTemplatesByUser(int id, Map<String, String> params) {
+    public Collection<Template> getTemplatesByUser(String username, Map<String, String> params) {
         //TODO Add parameter support
 
         final String sql = "SELECT * FROM Templates WHERE id IN (:ids)";
 
-        final Collection<AccessRights> accessRights = this.getUserAccessRights(id);
+        final Collection<AccessRights> accessRights = this.getUserAccessRights(username);
 
         Set<Integer> ids = new HashSet();
         accessRights.forEach((ar) -> ids.add(ar.getTemplateID()));
@@ -322,6 +330,13 @@ public class MySqlReportDaoImpl implements ReportDAO {
         }
 
         return templates;
+    }
+
+    @Override
+    public Template getUsersTemplateById(String username, int templateID) {
+        final String sql = "SELECT * FROM Templates JOIN AccessRights AS A ON ID = templateID AND A.username = ? AND templateID = ?";
+        Template template = jdbcTemplate.queryForObject(sql, new LayoutRowMapper(), username, templateID);
+        return template;
     }
 
     public int getUserIdByUsername(int id) {

@@ -190,12 +190,12 @@ public class ReportController {
     /**
      * This function is used for getting a users access rights.
      *
-     * @param id
+     * @param username Parameter for the user's username.
      * @return Returns a collection of AccessRights of a specific user.
      */
-    @RequestMapping(value = "/users/{id}/rights", method = RequestMethod.GET)
-    public Collection<AccessRights> getUserAccessRights(@PathVariable int id) {
-        return reportDAO.getUserAccessRights(id);
+    @RequestMapping(value = "/users/{username}/rights", method = RequestMethod.GET)
+    public Collection<AccessRights> getUserAccessRights(@PathVariable String username) {
+        return reportDAO.getUserAccessRights(username);
     }
 
     /**
@@ -204,25 +204,25 @@ public class ReportController {
      * Parameters:
      * layoutid
      *
-     * @param id
+     * @param username Parameter for the user's username.
      * @param params
      */
-    @RequestMapping(value = "/users/{id}/rights", method = RequestMethod.POST)
-    public void grantUserAccessRights(@PathVariable int id,
+    @RequestMapping(value = "/users/{username}/rights", method = RequestMethod.POST)
+    public void grantUserAccessRights(@PathVariable String username,
                                       @RequestParam Map<String, String> params) {
-        reportDAO.grantUserAccessRights(id, params);
+        reportDAO.grantUserAccessRights(username, params);
     }
 
     /**
      * This function is used for deleting a users access rights to some template.
      *
-     * @param id
+     * @param username  Parameter for the user's username.
      * @param params
      */
-    @RequestMapping(value = "/users/{id}/rights", method = RequestMethod.DELETE)
-    public void deleteUserAccessRights(@PathVariable int id,
+    @RequestMapping(value = "/users/{username}/rights", method = RequestMethod.DELETE)
+    public void deleteUserAccessRights(@PathVariable String username,
                                        @RequestParam Map<String, String> params) {
-        reportDAO.deleteUserAccessRights(id, params);
+        reportDAO.deleteUserAccessRights(username, params);
     }
 
     /**
@@ -235,15 +235,15 @@ public class ReportController {
      * sort,
      * search
      *
-     * @param id
+     * @param username The parameter for the user's username.
      * @param params
      * @return Returns a collection of reports filled by a user.
      */
-    @RequestMapping(value = "/users/{id}/reports", method = RequestMethod.GET)
+    @RequestMapping(value = "/users/{username}/reports", method = RequestMethod.GET)
     public Collection<Report> getReportsByUser(
-            @PathVariable("id") int id,
+            @PathVariable("username") String username,
             @RequestParam Map<String, String> params) {
-        return reportDAO.getReportsByUser(id, params);
+        return reportDAO.getReportsByUser(username, params);
     }
 
 
@@ -251,26 +251,53 @@ public class ReportController {
      * This function is used for creating a new report. The report is created based on the
      * information provided in the json.
      *
-     * @param id
+     * @param username The parameter for the user's username.
      * @param report
      */
-    @RequestMapping(value = "/users/{id}/reports", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void createReport(@PathVariable int id, @RequestBody Report report) {
-        reportDAO.createReport(id, report);
+    @RequestMapping(value = "/users/{username}/reports", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void createReport(@PathVariable String username, @RequestBody Report report) {
+        reportDAO.createReport(username, report);
+    }
+
+    /**
+     * This function is used for getting a report by id that the user has submitted.
+     *
+     * @param username
+     * @param reportID
+     */
+    @RequestMapping(value = "users/{username}/reports/{reportId}", method = RequestMethod.GET)
+    public Report getUsersReportById (
+            @PathVariable("username") String username,
+            @PathVariable("reportId") int reportID) {
+        return reportDAO.getUsersReportById(username, reportID);
     }
 
     /**
      * This function is used for getting templates.
      *
-     * @param id
+     * @param username The parameter for the user's username.
      * @param params
      * @return Returns a collection of templates a user has access rights to.
      */
-    @RequestMapping(value = "/users/{id}/templates", method = RequestMethod.GET)
+    @RequestMapping(value = "/users/{username}/templates", method = RequestMethod.GET)
     public Collection<Template> getTemplatesByUser(
-            @PathVariable("id") int id,
+            @PathVariable("username") String username,
             @RequestParam Map<String, String> params) {
-        return reportDAO.getTemplatesByUser(id, params);
+        return reportDAO.getTemplatesByUser(username, params);
+    }
+
+    /**
+     * This function is used for getting a template by id that the user has access to.
+     *
+     * @param username The parameter for the user's username
+     * @param templateID The id specific to a template.
+     * @return Returns a Template specified by id path variable.
+     */
+    @RequestMapping(value = "users/{username}/templates/{templateId}", method = RequestMethod.GET)
+    public Template getUsersTemplateById (
+            @PathVariable("username") String username,
+            @PathVariable("templateId") int templateID) {
+        return reportDAO.getUsersTemplateById(username, templateID);
     }
 
 }

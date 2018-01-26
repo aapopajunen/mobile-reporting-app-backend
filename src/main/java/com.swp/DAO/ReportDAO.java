@@ -49,23 +49,29 @@ public interface ReportDAO {
     // /users/{username}
     void deleteUserByUsername(String username);
 
-    // /users/{id}/rights
-    Collection<AccessRights> getUserAccessRights(int id);
+    // /users/{username}/rights
+    Collection<AccessRights> getUserAccessRights(String username);
 
-    // /users/{id}/rights
-    void grantUserAccessRights(int id, Map<String,String> params);
+    // /users/{username}/rights
+    void grantUserAccessRights(String username, Map<String,String> params);
 
-    // /users/{id}/rights
-    void deleteUserAccessRights(int id, Map<String, String> params);
+    // /users/{username}/rights
+    void deleteUserAccessRights(String username, Map<String, String> params);
 
-    // /users/{id}/reports
-    Collection<Report> getReportsByUser(int id, Map<String,String> params);
+    // /users/{username}/reports
+    Collection<Report> getReportsByUser(String username, Map<String,String> params);
 
-    // /users/{id}/reports
-    void createReport(int id, Report report);
+    // /users/{username}/reports
+    void createReport(String username, Report report);
 
-    // /users/{id}/reports
-    Collection<Template> getTemplatesByUser(int id, Map<String, String> params);
+    // /users/{username}/reports
+    Report getUsersReportById(String username, int reportId);
+
+    // /users/{username}/templates
+    Collection<Template> getTemplatesByUser(String username, Map<String, String> params);
+
+    // users/{username}/templates/{templateId}
+    Template getUsersTemplateById(String username, int templateId);
 
 
 }
