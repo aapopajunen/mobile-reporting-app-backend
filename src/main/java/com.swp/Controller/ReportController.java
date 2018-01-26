@@ -266,10 +266,38 @@ public class ReportController {
      * @param reportID
      */
     @RequestMapping(value = "users/{username}/reports/{reportId}", method = RequestMethod.GET)
-    public Report getUsersReportById (
+    public Report getUserReportById (
             @PathVariable("username") String username,
             @PathVariable("reportId") int reportID) {
-        return reportDAO.getUsersReportById(username, reportID);
+        return reportDAO.getUserReportById(username, reportID);
+    }
+
+    /**
+     * This function is used for getting the fields of a report by the user.
+     *
+     * @param username  The user's username
+     * @param reportId  The id of the report.
+     * @return Returns a collection of the fields included in the report.
+     */
+    @RequestMapping(value = "/users/{username}/reports/{reportId}/fields", method = RequestMethod.GET)
+    public Collection<Field> getUserReportFieldsById(
+            @PathVariable("username") String username,
+            @PathVariable("reportId") int reportId) {
+        return reportDAO.getUserReportFieldsById(username, reportId);
+    }
+
+    /**
+     * This function is used for getting the users answers of a report specified by the report id.
+     *
+     * @param username The username unique to the user.
+     * @param reportId The report id that specifies which report's answers are returned.
+     * @return Returns a collection of the FieldAnswers.
+     */
+    @RequestMapping(value = "users/{username}/reports/{reportId}/answers", method = RequestMethod.GET)
+    public Collection<FieldAnswer> getUserAnswersByReportId (
+            @PathVariable("username") String username,
+            @PathVariable("reportId") int reportId) {
+        return reportDAO.getUserAnswersByReportId(username, reportId);
     }
 
     /**
@@ -280,7 +308,7 @@ public class ReportController {
      * @return Returns a collection of templates a user has access rights to.
      */
     @RequestMapping(value = "/users/{username}/templates", method = RequestMethod.GET)
-    public Collection<Template> getTemplatesByUser(
+    public Collection<Template> getTemplatesByUser (
             @PathVariable("username") String username,
             @RequestParam Map<String, String> params) {
         return reportDAO.getTemplatesByUser(username, params);
@@ -290,14 +318,43 @@ public class ReportController {
      * This function is used for getting a template by id that the user has access to.
      *
      * @param username The parameter for the user's username
-     * @param templateID The id specific to a template.
+     * @param templateId The id specific to a template.
      * @return Returns a Template specified by id path variable.
      */
     @RequestMapping(value = "users/{username}/templates/{templateId}", method = RequestMethod.GET)
-    public Template getUsersTemplateById (
+    public Template getUserTemplateById (
             @PathVariable("username") String username,
-            @PathVariable("templateId") int templateID) {
-        return reportDAO.getUsersTemplateById(username, templateID);
+            @PathVariable("templateId") int templateId) {
+        return reportDAO.getUserTemplateById(username, templateId);
     }
+
+    /**
+     * This function is used for getting the fields included in a template that the user has access to
+     *
+     * @param username The username unique to the user.
+     * @param templateId The id of the template
+     * @return Returns a collection of fields included in the template.
+     */
+    @RequestMapping(value = "users/{username}/templates/{templateId}/fields", method = RequestMethod.GET)
+    public Collection<Field> getUserTemplateFieldsById (
+            @PathVariable("username") String username,
+            @PathVariable("templateId") int templateId) {
+        return reportDAO.getUserTemplateFieldsById(username, templateId);
+    }
+
+    /**
+     * This function is used for getting all the reports of a certain template made by the user.
+     *
+     * @param username The username unique to the user.
+     * @param templateId The id of the template
+     * @return Returns a collection of the reports.
+     */
+    @RequestMapping(value = "users/{username}/templates/{templateId}/reports", method = RequestMethod.GET)
+    public Collection<Report> getUserReportsByTemplateId (
+            @PathVariable("username") String username,
+            @PathVariable("templateId") int templateId) {
+        return reportDAO.getUserReportsByTemplateId(username, templateId);
+    }
+
 
 }

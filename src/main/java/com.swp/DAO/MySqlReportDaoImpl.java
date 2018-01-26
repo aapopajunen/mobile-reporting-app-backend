@@ -280,10 +280,35 @@ public class MySqlReportDaoImpl implements ReportDAO {
     }
 
     @Override
-    public Report getUsersReportById(String username, int reportId) {
+    public Report getUserReportById(String username, int reportId) {
         final String sql = "SELECT * FROM Reports AS R JOIN Users AS U ON U.username = R.username AND U.username = ? AND R.ID = ?";
         Report report = jdbcTemplate.queryForObject(sql, new FormRowMapper(), username, reportId);
         return report;
+    }
+
+    @Override
+    public Collection<Field> getUserReportFieldsById(String username, int reportId) {
+        final String templateIdSql= "SELECT templateID FROM Reports WHERE username = ? AND ID = ?";
+
+        int templateId = jdbcTemplate.queryForObject(templateIdSql, Integer.class, username, reportId);
+
+        final String sql = "SELECT * FROM Fields WHERE templateID = ?";
+
+        Collection<Field> fields = jdbcTemplate.query(sql, new FieldRowMapper(), templateId);
+
+        return fields;
+    }
+
+    @Override
+    public Collection<FieldAnswer> getUserAnswersByReportId(String username, int reportId) {
+        final String reportIdSql = "SELECT ID FROM Reports WHERE username = ? AND ID = ?";
+
+        int reportID = jdbcTemplate.queryForObject(reportIdSql, Integer.class, username, reportId);
+
+        final String sql = "SELECT * FROM FieldAnswers WHERE reportID = ?";
+
+        Collection<FieldAnswer> answers = jdbcTemplate.query(sql, new FieldAnswerRowMapper(), reportID);
+        return answers;
     }
 
     @Override
@@ -333,10 +358,31 @@ public class MySqlReportDaoImpl implements ReportDAO {
     }
 
     @Override
-    public Template getUsersTemplateById(String username, int templateID) {
+    public Template getUserTemplateById(String username, int templateId) {
         final String sql = "SELECT * FROM Templates JOIN AccessRights AS A ON ID = templateID AND A.username = ? AND templateID = ?";
-        Template template = jdbcTemplate.queryForObject(sql, new LayoutRowMapper(), username, templateID);
+        Template template = jdbcTemplate.queryForObject(sql, new LayoutRowMapper(), username, templateId);
         return template;
+    }
+
+    @Override
+    public Collection<Field> getUserTemplateFieldsById(String username, int templateId) {
+        final String templateIdSql = "SELECT templateID FROM AccessRights WHERE username = ? AND templateID = ?";
+
+        int templateID = jdbcTemplate.queryForObject(templateIdSql, Integer.class, username, templateId);
+
+        final String sql = "SELECT * FROM Fields WHERE templateID = ?";
+
+        Collection<Field> fields = jdbcTemplate.query(sql, new FieldRowMapper(), templateID);
+
+        return fields;
+    }
+
+    @Override
+    public Collection<Report> getUserReportsByTemplateId(String username, int templateId) {
+        final String sql = "SELECT * FROM Reports WHERE username = ? and templateID = ?";
+
+        Collection<Report> reports = jdbcTemplate.query(sql, new FormRowMapper(), username, templateId);
+        return reports;
     }
 
     public int getUserIdByUsername(int id) {

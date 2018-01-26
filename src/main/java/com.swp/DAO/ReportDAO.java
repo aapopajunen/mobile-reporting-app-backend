@@ -64,14 +64,26 @@ public interface ReportDAO {
     // /users/{username}/reports
     void createReport(String username, Report report);
 
-    // /users/{username}/reports
-    Report getUsersReportById(String username, int reportId);
+    // /users/{username}/reports/{reportId}
+    Report getUserReportById(String username, int reportId);
+
+    // /users/{username}/reports/{reportId}/fields
+    Collection<Field> getUserReportFieldsById(String username, int reportId);
+
+    // /users/{username}/reports/{reportId}/answers
+    Collection<FieldAnswer> getUserAnswersByReportId(String username, int reportId);
 
     // /users/{username}/templates
     Collection<Template> getTemplatesByUser(String username, Map<String, String> params);
 
     // users/{username}/templates/{templateId}
-    Template getUsersTemplateById(String username, int templateId);
+    Template getUserTemplateById(String username, int templateId);
+
+    // /users/{username}/templates/{templateId}/fields
+    Collection<Field> getUserTemplateFieldsById(String username, int templateId);
+
+    // users/{username}/templates/{templateId}/reports
+    Collection<Report> getUserReportsByTemplateId(String username, int templateId);
 
 
 }
