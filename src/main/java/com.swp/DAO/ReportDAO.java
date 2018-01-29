@@ -49,23 +49,41 @@ public interface ReportDAO {
     // /users/{username}
     void deleteUserByUsername(String username);
 
-    // /users/{id}/rights
-    Collection<AccessRights> getUserAccessRights(int id);
+    // /users/{username}/rights
+    Collection<AccessRights> getUserAccessRights(String username);
 
-    // /users/{id}/rights
-    void grantUserAccessRights(int id, Map<String,String> params);
+    // /users/{username}/rights
+    void grantUserAccessRights(String username, Map<String,String> params);
 
-    // /users/{id}/rights
-    void deleteUserAccessRights(int id, Map<String, String> params);
+    // /users/{username}/rights
+    void deleteUserAccessRights(String username, Map<String, String> params);
 
-    // /users/{id}/reports
-    Collection<Report> getReportsByUser(int id, Map<String,String> params);
+    // /users/{username}/reports
+    Collection<Report> getReportsByUser(String username, Map<String,String> params);
 
-    // /users/{id}/reports
-    void createReport(int id, Report report);
+    // /users/{username}/reports
+    void createReport(String username, Report report);
 
-    // /users/{id}/reports
-    Collection<Template> getTemplatesByUser(int id, Map<String, String> params);
+    // /users/{username}/reports/{reportId}
+    Report getUserReportById(String username, int reportId);
+
+    // /users/{username}/reports/{reportId}/fields
+    Collection<Field> getUserReportFieldsById(String username, int reportId);
+
+    // /users/{username}/reports/{reportId}/answers
+    Collection<FieldAnswer> getUserAnswersByReportId(String username, int reportId);
+
+    // /users/{username}/templates
+    Collection<Template> getTemplatesByUser(String username, Map<String, String> params);
+
+    // users/{username}/templates/{templateId}
+    Template getUserTemplateById(String username, int templateId);
+
+    // /users/{username}/templates/{templateId}/fields
+    Collection<Field> getUserTemplateFieldsById(String username, int templateId);
+
+    // users/{username}/templates/{templateId}/reports
+    Collection<Report> getUserReportsByTemplateId(String username, int templateId);
 
 
 }
