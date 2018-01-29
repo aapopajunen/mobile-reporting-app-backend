@@ -33,7 +33,7 @@ public class ReportController {
      * sort,
      * search
      * 
-     * @param params
+     * @param params Query parameters from the url.
      * @return Returns a collection of reports based on the given parameters.
      */
     @RequestMapping(value = "/reports", method = RequestMethod.GET)
@@ -44,8 +44,8 @@ public class ReportController {
     /**
      * This function is used for getting a specific report by id.
      *
-     * @param id
-     * @return Returns a form by the id specified in the path.
+     * @param id The id of the wanted report.
+     * @return Returns a report by the id specified in the path.
      */
     @RequestMapping(value = "/reports/{id}", method = RequestMethod.GET)
     public Report getReportById(@PathVariable int id) {
@@ -57,7 +57,7 @@ public class ReportController {
      * This function is used for deleting reports. When a report is deleted, all the answers
      * related to it will also get deleted.
      *
-     * @param id
+     * @param id The id of the report to be deleted.
      */
     @RequestMapping(value = "/reports/{id}", method = RequestMethod.DELETE)
     public void deleteReportById(@PathVariable int id) {
@@ -65,10 +65,10 @@ public class ReportController {
     }
 
     /**
-     * This function is used for accepting a report by id. The reports acception date will be set
-     * automatically set to current date.
+     * This function is used for accepting a report by id. The report's acceptance date will be set
+     * automatically to the current date.
      *
-     * @param id
+     * @param id The of the report to be accepted.
      */
     @RequestMapping(value = "/reports/{id}", method = RequestMethod.PUT)
     public void acceptReportById(@PathVariable int id) {
@@ -78,23 +78,23 @@ public class ReportController {
     /**
      * This funnction is used for getting the fields of a report specified by the report id.
      *
-     * @param formId
+     * @param reportId The id of the wanted report.
      * @return Returns a collection of fields of a specific report.
      */
     @RequestMapping(value = "/reports/{id}/fields", method = RequestMethod.GET)
-    public Collection<Field> getFieldsByReportId(@PathVariable("id") int formId) {
-        return reportDAO.getFieldsByReportId(formId);
+    public Collection<Field> getFieldsByReportId(@PathVariable("id") int reportId) {
+        return reportDAO.getFieldsByReportId(reportId);
     }
 
     /**
      * This function is used for getting the answers of a report specified by the report id.
      *
-     * @param formId
+     * @param reportId The id of the wanted report.
      * @return Returns a collection of FieldAnswers of a specific report.
      */
     @RequestMapping(value = "/reports/{id}/answers", method = RequestMethod.GET)
-    public Collection<FieldAnswer> getAnswersByReportId(@PathVariable("id") int formId) {
-        return reportDAO.getAnswersByReportId(formId);
+    public Collection<FieldAnswer> getAnswersByReportId(@PathVariable("id") int reportId) {
+        return reportDAO.getAnswersByReportId(reportId);
     }
 
     /**
@@ -106,7 +106,7 @@ public class ReportController {
      * sort,
      * search
      *
-     * @param params
+     * @param params Query parameters from the url.
      * @return Returns a collection of reports based on the given parameters.
      */
     @RequestMapping(value = "/templates", method = RequestMethod.GET)
@@ -117,7 +117,7 @@ public class ReportController {
     /**
      * This function is used for getting a template specified by the template id.
      *
-     * @param templateId
+     * @param templateId The id of the template.
      * @return Returns a Template specified by id path variable.
      */
     @RequestMapping(value = "/templates/{id}", method = RequestMethod.GET)
@@ -128,7 +128,7 @@ public class ReportController {
     /**
      * This function is used for getting Fields of a specific template.
      *
-     * @param templateId
+     * @param templateId The id of the template.
      * @return Returns a collection of Fields based on the id path variable.
      */
     @RequestMapping(value = "/templates/{id}/fields", method = RequestMethod.GET)
@@ -149,7 +149,7 @@ public class ReportController {
     /**
      * This function is used for creating a new user.
      *
-     * @param username
+     * @param username The username unique to the user.
      */
     @RequestMapping(value = "/users/{username}", method = RequestMethod.POST)
     public void createUser(@PathVariable String username) {
@@ -159,7 +159,7 @@ public class ReportController {
     /**
      * This function is used for getting a specific user.
      *
-     * @param id
+     * @param id The id specific to the user.
      * @return Returns a user with the given id.
      */
     @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
@@ -170,7 +170,7 @@ public class ReportController {
     /**
      * This function is used for deleting a user by username.
      *
-     * @param username
+     * @param username The username of the user to be deleted.
      */
     @RequestMapping(value = "/users/{username}", method = RequestMethod.DELETE)
     public void deleteUserByUsername(@PathVariable("username") String username) {
@@ -180,7 +180,7 @@ public class ReportController {
     /**
      * This function is used for deleting a user by id.
      *
-     * @param id
+     * @param id The id of the user to be deleted.
      */
     @RequestMapping(value = "/users/{id}", method = RequestMethod.DELETE)
     public void deleteUserById(@PathVariable("id") int id) {
@@ -190,7 +190,7 @@ public class ReportController {
     /**
      * This function is used for getting a users access rights.
      *
-     * @param id
+     * @param id The id specific to the user.
      * @return Returns a collection of AccessRights of a specific user.
      */
     @RequestMapping(value = "/users/{id}/rights", method = RequestMethod.GET)
@@ -202,10 +202,10 @@ public class ReportController {
      *This function is used for granting a specific user access rights to some template.
      *
      * Parameters:
-     * layoutid
+     * templateid
      *
-     * @param id
-     * @param params
+     * @param id The id of the template.
+     * @param params Query parameters from the url.
      */
     @RequestMapping(value = "/users/{id}/rights", method = RequestMethod.POST)
     public void grantUserAccessRights(@PathVariable int id,
@@ -214,10 +214,10 @@ public class ReportController {
     }
 
     /**
-     * This function is used for deleting a users access rights to some template.
+     * This function is used for deleting a user's access rights to some template.
      *
-     * @param id
-     * @param params
+     * @param id The id specific to the user.
+     * @param params Query parameters from the url.
      */
     @RequestMapping(value = "/users/{id}/rights", method = RequestMethod.DELETE)
     public void deleteUserAccessRights(@PathVariable int id,
@@ -235,8 +235,8 @@ public class ReportController {
      * sort,
      * search
      *
-     * @param id
-     * @param params
+     * @param id The id specific to the user.
+     * @param params Query parameters from the url.
      * @return Returns a collection of reports filled by a user.
      */
     @RequestMapping(value = "/users/{id}/reports", method = RequestMethod.GET)
@@ -251,8 +251,8 @@ public class ReportController {
      * This function is used for creating a new report. The report is created based on the
      * information provided in the json.
      *
-     * @param id
-     * @param report
+     * @param id The id specific to the user.
+     * @param report The report to be added to the database.
      */
     @RequestMapping(value = "/users/{id}/reports", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public void createReport(@PathVariable int id, @RequestBody Report report) {
@@ -262,8 +262,8 @@ public class ReportController {
     /**
      * This function is used for getting templates.
      *
-     * @param id
-     * @param params
+     * @param id The id specific to the user.
+     * @param params Query parameters from the url.
      * @return Returns a collection of templates a user has access rights to.
      */
     @RequestMapping(value = "/users/{id}/templates", method = RequestMethod.GET)
