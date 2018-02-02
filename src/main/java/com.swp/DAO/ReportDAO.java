@@ -7,35 +7,7 @@ import java.util.Map;
 
 public interface ReportDAO {
 
-    // /reports
-    Collection<Report> getReports(Map<String, String> params);
-
-    // /reports/{reportId}
-    Report getReportsById(int reportId);
-
-    // /reports/{reportId}
-    void deleteReportById(int reportId);
-
-    // /reports/{reportId}
-    void acceptReportById(int reportId);
-
-    // /reports/{reportId}/fields
-    Collection<Field> getFieldsByReportId(int reportId);
-
-    // /reports/{reportId}/answers
-    Collection<FieldAnswer> getAnswersByReportId(int reportId);
-
-    // /templates
-    Collection<Template> getTemplates(Map<String, String> params);
-
-    // /templates/{templateId}
-    Template getTemplateById(int templateId);
-
-    // /templates/{templateId}/fields
-    Collection<Field> getFieldsByTemplateId(int templateId);
-
-    // /users
-    Collection<User> getAllUsers();
+    User checkLoginCredentials(LoginCredentials loginCredentials);
 
     // /users/{username}
     void createUser(String username);
@@ -65,7 +37,7 @@ public interface ReportDAO {
     void createReport(String username, Report report);
 
     // /users/{username}/reports/{reportId}
-    Report getUserReportById(String username, int reportId);
+    Report getUserReportById(String username, int reportId, Map<String, String> params);
 
     // /users/{username}/reports/{reportId}/fields
     Collection<Field> getUserReportFieldsById(String username, int reportId);
@@ -83,7 +55,7 @@ public interface ReportDAO {
     Collection<Field> getUserTemplateFieldsById(String username, int templateId);
 
     // users/{username}/templates/{templateId}/reports
-    Collection<Report> getUserReportsByTemplateId(String username, int templateId);
+    Collection<Report> getUserReportsByTemplateId(String username, int templateId, Map<String, String> params);
 
 
 }

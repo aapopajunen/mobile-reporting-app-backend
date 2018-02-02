@@ -4,9 +4,11 @@ import com.swp.Entity.*;
 
 import com.swp.DAO.ReportDAO;
 
+import com.swp.Security.JwtGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -22,169 +24,10 @@ public class ReportController {
     @Qualifier("mysql")
     private ReportDAO reportDAO;
 
-    /**
-     * This function is used for getting reports.
-     *
-     * Supported parameters:
-     * templateid,
-     * userid,
-     * page,
-     * pagesize,
-     * sort,
-     * search
-     * 
-     * @param params Query parameters from the url.
-     * @return Returns a collection of reports based on the given parameters.
-     */
-    @RequestMapping(value = "/reports", method = RequestMethod.GET)
-    public Collection<Report> getReports(@RequestParam Map<String, String> params) {
-        return reportDAO.getReports(params);
-    }
-
-    /**
-     * This function is used for getting a specific report by id.
-     *
-     * @param id The id of the wanted report.
-     * @return Returns a report by the id specified in the path.
-     */
-    @RequestMapping(value = "/reports/{id}", method = RequestMethod.GET)
-    public Report getReportById(@PathVariable int id) {
-        return reportDAO.getReportsById(id);
-    }
-
-
-    /**
-     * This function is used for deleting reports. When a report is deleted, all the answers
-     * related to it will also get deleted.
-     *
-     * @param id The id of the report to be deleted.
-     */
-    @RequestMapping(value = "/reports/{id}", method = RequestMethod.DELETE)
-    public void deleteReportById(@PathVariable int id) {
-        reportDAO.deleteReportById(id);
-    }
-
-    /**
-     * This function is used for accepting a report by id. The report's acceptance date will be set
-     * automatically to the current date.
-     *
-     * @param id The of the report to be accepted.
-     */
-    @RequestMapping(value = "/reports/{id}", method = RequestMethod.PUT)
-    public void acceptReportById(@PathVariable int id) {
-        reportDAO.acceptReportById(id);
-    }
-
-    /**
-     * This funnction is used for getting the fields of a report specified by the report id.
-     *
-     * @param reportId The id of the wanted report.
-     * @return Returns a collection of fields of a specific report.
-     */
-    @RequestMapping(value = "/reports/{id}/fields", method = RequestMethod.GET)
-    public Collection<Field> getFieldsByReportId(@PathVariable("id") int reportId) {
-        return reportDAO.getFieldsByReportId(reportId);
-    }
-
-    /**
-     * This function is used for getting the answers of a report specified by the report id.
-     *
-     * @param reportId The id of the wanted report.
-     * @return Returns a collection of FieldAnswers of a specific report.
-     */
-    @RequestMapping(value = "/reports/{id}/answers", method = RequestMethod.GET)
-    public Collection<FieldAnswer> getAnswersByReportId(@PathVariable("id") int reportId) {
-        return reportDAO.getAnswersByReportId(reportId);
-    }
-
-    /**
-     * This function is used for getting templates.
-     *
-     * parameters:
-     * page,
-     * pagesize,
-     * sort,
-     * search
-     *
-     * @param params Query parameters from the url.
-     * @return Returns a collection of reports based on the given parameters.
-     */
-    @RequestMapping(value = "/templates", method = RequestMethod.GET)
-    public Collection<Template> getTemplates(@RequestParam Map<String, String> params) {
-       return reportDAO.getTemplates(params);
-    }
-
-    /**
-     * This function is used for getting a template specified by the template id.
-     *
-     * @param templateId The id of the template.
-     * @return Returns a Template specified by id path variable.
-     */
-    @RequestMapping(value = "/templates/{id}", method = RequestMethod.GET)
-    public Template getTemplateById(@PathVariable("id") int templateId) {
-        return reportDAO.getTemplateById(templateId);
-    }
-
-    /**
-     * This function is used for getting Fields of a specific template.
-     *
-     * @param templateId The id of the template.
-     * @return Returns a collection of Fields based on the id path variable.
-     */
-    @RequestMapping(value = "/templates/{id}/fields", method = RequestMethod.GET)
-    public Collection<Field> getFieldsByTemplateId(@PathVariable("id") int templateId) {
-        return reportDAO.getFieldsByTemplateId(templateId);
-    }
-
-    /**
-     * This function is used for getting users.
-     *
-     * @return Returns a collection containing all Users.
-     */
-    @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public Collection<User> getAllUsers() {
-        return reportDAO.getAllUsers();
-    }
-
-    /**
-     * This function is used for creating a new user.
-     *
-     * @param username The username unique to the user.
-     */
-    @RequestMapping(value = "/users/{username}", method = RequestMethod.POST)
-    public void createUser(@PathVariable String username) {
-        reportDAO.createUser(username);
-    }
-
-    /**
-     * This function is used for getting a specific user.
-     *
-     * @param id The id specific to the user.
-     * @return Returns a user with the given id.
-     */
-    @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
-    public User getUserById(@PathVariable int id) {
-        return reportDAO.getUserById(id);
-    }
-
-    /**
-     * This function is used for deleting a user by username.
-     *
-     * @param username The username of the user to be deleted.
-     */
-    @RequestMapping(value = "/users/{username}", method = RequestMethod.DELETE)
-    public void deleteUserByUsername(@PathVariable("username") String username) {
-        reportDAO.deleteUserByUsername(username);
-    }
-
-    /**
-     * This function is used for deleting a user by id.
-     *
-     * @param id The id of the user to be deleted.
-     */
-    @RequestMapping(value = "/users/{id}", method = RequestMethod.DELETE)
-    public void deleteUserById(@PathVariable("id") int id) {
-        reportDAO.deleteUserById(id);
+    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public SimpleToken login(@RequestBody LoginCredentials loginCredentials) {
+        User user = reportDAO.checkLoginCredentials(loginCredentials);
+        return new SimpleToken(new JwtGenerator().generate(user));
     }
 
     /**
@@ -193,7 +36,7 @@ public class ReportController {
      * @param username Parameter for the user's username.
      * @return Returns a collection of AccessRights of a specific user.
      */
-    @RequestMapping(value = "/users/{username}/rights", method = RequestMethod.GET)
+    @GetMapping("/users/{username}/rights")
     public Collection<AccessRights> getUserAccessRights(@PathVariable String username) {
         return reportDAO.getUserAccessRights(username);
     }
@@ -207,7 +50,7 @@ public class ReportController {
      * @param username The username specific to the user.
      * @param params Query parameters from the url.
      */
-    @RequestMapping(value = "/users/{username}/rights", method = RequestMethod.POST)
+    @PostMapping("/users/{username}/rights")
     public void grantUserAccessRights(@PathVariable String username,
                                       @RequestParam Map<String, String> params) {
         reportDAO.grantUserAccessRights(username, params);
@@ -219,7 +62,7 @@ public class ReportController {
      * @param username  The username specific to the user.
      * @param params Query parameters from the url.
      */
-    @RequestMapping(value = "/users/{username}/rights", method = RequestMethod.DELETE)
+    @DeleteMapping("/users/{username}/rights")
     public void deleteUserAccessRights(@PathVariable String username,
                                        @RequestParam Map<String, String> params) {
         reportDAO.deleteUserAccessRights(username, params);
@@ -239,7 +82,8 @@ public class ReportController {
      * @param params Query parameters from the url
      * @return Returns a collection of reports filled by a user.
      */
-    @RequestMapping(value = "/users/{username}/reports", method = RequestMethod.GET)
+    @GetMapping("/users/{username}/reports")
+    @PreAuthorize("#username == authentication.name")
     public Collection<Report> getReportsByUser(
             @PathVariable("username") String username,
             @RequestParam Map<String, String> params) {
@@ -254,7 +98,8 @@ public class ReportController {
      * @param username The username specific to the user.
      * @param report The report to be added to the database.
      */
-    @RequestMapping(value = "/users/{username}/reports", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/users/{username}/reports", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("#username == authentication.name")
     public void createReport(@PathVariable String username, @RequestBody Report report) {
         reportDAO.createReport(username, report);
     }
@@ -265,11 +110,13 @@ public class ReportController {
      * @param username The username specific to the user.
      * @param reportID The id of the report.
      */
-    @RequestMapping(value = "users/{username}/reports/{reportId}", method = RequestMethod.GET)
+    @GetMapping("/users/{username}/reports/{reportId}")
+    @PreAuthorize("#username == authentication.name")
     public Report getUserReportById (
             @PathVariable("username") String username,
-            @PathVariable("reportId") int reportID) {
-        return reportDAO.getUserReportById(username, reportID);
+            @PathVariable("reportId") int reportID,
+            @RequestParam Map<String, String> params) {
+        return reportDAO.getUserReportById(username, reportID, params);
     }
 
     /**
@@ -279,7 +126,8 @@ public class ReportController {
      * @param reportId  The id of the report.
      * @return Returns a collection of the fields included in the report.
      */
-    @RequestMapping(value = "/users/{username}/reports/{reportId}/fields", method = RequestMethod.GET)
+    @GetMapping("/users/{username}/reports/{reportId}/fields")
+    @PreAuthorize("#username == authentication.name")
     public Collection<Field> getUserReportFieldsById(
             @PathVariable("username") String username,
             @PathVariable("reportId") int reportId) {
@@ -293,7 +141,8 @@ public class ReportController {
      * @param reportId The report id that specifies which report's answers are returned.
      * @return Returns a collection of the FieldAnswers.
      */
-    @RequestMapping(value = "users/{username}/reports/{reportId}/answers", method = RequestMethod.GET)
+    @GetMapping("users/{username}/reports/{reportId}/answers")
+    @PreAuthorize("#username == authentication.name")
     public Collection<FieldAnswer> getUserAnswersByReportId (
             @PathVariable("username") String username,
             @PathVariable("reportId") int reportId) {
@@ -307,7 +156,8 @@ public class ReportController {
      * @param params Query parameters from the url.
      * @return Returns a collection of templates a user has access rights to.
      */
-    @RequestMapping(value = "/users/{username}/templates", method = RequestMethod.GET)
+    @GetMapping("/users/{username}/templates")
+    @PreAuthorize("#username == authentication.name")
     public Collection<Template> getTemplatesByUser (
             @PathVariable("username") String username,
             @RequestParam Map<String, String> params) {
@@ -321,7 +171,8 @@ public class ReportController {
      * @param templateId The id specific to a template.
      * @return Returns a Template specified by id path variable.
      */
-    @RequestMapping(value = "users/{username}/templates/{templateId}", method = RequestMethod.GET)
+    @GetMapping("/users/{username}/templates/{templateId}")
+    @PreAuthorize("#username == authentication.name")
     public Template getUserTemplateById (
             @PathVariable("username") String username,
             @PathVariable("templateId") int templateId) {
@@ -335,7 +186,8 @@ public class ReportController {
      * @param templateId The id of the template
      * @return Returns a collection of fields included in the template.
      */
-    @RequestMapping(value = "users/{username}/templates/{templateId}/fields", method = RequestMethod.GET)
+    @GetMapping("/users/{username}/templates/{templateId}/fields")
+    @PreAuthorize("#username == authentication.name")
     public Collection<Field> getUserTemplateFieldsById (
             @PathVariable("username") String username,
             @PathVariable("templateId") int templateId) {
@@ -349,11 +201,13 @@ public class ReportController {
      * @param templateId The id of the template
      * @return Returns a collection of the reports.
      */
-    @RequestMapping(value = "users/{username}/templates/{templateId}/reports", method = RequestMethod.GET)
+    @GetMapping("/users/{username}/templates/{templateId}/reports")
+    @PreAuthorize("#username == authentication.name")
     public Collection<Report> getUserReportsByTemplateId (
             @PathVariable("username") String username,
-            @PathVariable("templateId") int templateId) {
-        return reportDAO.getUserReportsByTemplateId(username, templateId);
+            @PathVariable("templateId") int templateId,
+            @RequestParam Map<String, String> params) {
+        return reportDAO.getUserReportsByTemplateId(username, templateId, params);
     }
 
 
