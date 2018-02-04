@@ -133,7 +133,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
 
     @Override
     public User checkLoginCredentials(LoginCredentials loginCredentials) {
-        final String sql = "SELECT * FROM Users WHERE username = ? AND password = ?";
+        final String sql = "SELECT * FROM Users WHERE BINARY username = ? AND BINARY password = ?";
 
         try {
             final User user = jdbcTemplate.queryForObject(sql, new UserRowMapper(),loginCredentials.getUsername(), loginCredentials.getPassword());
@@ -175,7 +175,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
     // DELETE /users{userid}
     @Override
     public void deleteUserByUsername(String username) {
-        final String sql = "DELETE FROM Users WHERE username = ?";
+        final String sql = "DELETE FROM Users WHERE BINARY username = ?";
 
         jdbcTemplate.update(sql, username);
     }
@@ -183,7 +183,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
     // GET /users/{username}/rights
     @Override
     public Collection<AccessRights> getUserAccessRights(String username) {
-        final String sql = "SELECT * FROM AccessRights WHERE username = ?";
+        final String sql = "SELECT * FROM AccessRights WHERE BINARY username = ?";
 
         Collection<AccessRights> accessRights = jdbcTemplate.query(sql, new AccessRightsRowMapper(), username);
 
@@ -203,7 +203,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
     // DELETE /users/{username}/rights
     @Override
     public void deleteUserAccessRights(String username, Map<String, String> params) {
-        final String sql = "DELETE FROM AccessRights WHERE username = ? AND templateid = ?";
+        final String sql = "DELETE FROM AccessRights WHERE BINARY username = ? AND templateid = ?";
 
         if(params.containsKey("templateid")) {
             jdbcTemplate.update(sql, username, params.get("templateid"));
@@ -215,7 +215,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
     @Override
     public Collection<Report> getReportsByUser(String username, Map<String, String> params) {
 
-        final String sql = new SQLBuilder("SELECT * FROM Reports WHERE username = ?", params)
+        final String sql = new SQLBuilder("SELECT * FROM Reports WHERE BINARY username = ?", params)
                 .sqlSearch()
                 .sqlSort()
                 .sqlPagination()
@@ -229,7 +229,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
     // GET /users/{username}/reports/{reportId}
     @Override
     public Report getUserReportById(String username, int reportId, Map<String, String> params) {
-        final String sql = "SELECT * FROM Reports AS R JOIN Users AS U ON U.username = R.username AND U.username = ? AND R.ID = ?";
+        final String sql = "SELECT * FROM Reports AS R JOIN Users AS U ON BINARY U.username = R.username AND BINARY U.username = ? AND R.ID = ?";
         Report report = jdbcTemplate.queryForObject(sql, new ReportRowMapper(), username, reportId);
         return report;
     }
@@ -237,7 +237,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
     // GET /users/{username}/reports/{reportid}/fields
     @Override
     public Collection<Field> getUserReportFieldsById(String username, int reportId) {
-        final String templateIdSql= "SELECT templateID FROM Reports WHERE username = ? AND ID = ?";
+        final String templateIdSql= "SELECT templateID FROM Reports WHERE BINARY username = ? AND ID = ?";
 
         int templateId = jdbcTemplate.queryForObject(templateIdSql, Integer.class, username, reportId);
 
@@ -251,7 +251,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
     // GET /users/{username}/reports/{reportId}/answers
     @Override
     public Collection<FieldAnswer> getUserAnswersByReportId(String username, int reportId) {
-        final String reportIdSql = "SELECT ID FROM Reports WHERE username = ? AND ID = ?";
+        final String reportIdSql = "SELECT ID FROM Reports WHERE BINARY username = ? AND ID = ?";
 
         int reportID = jdbcTemplate.queryForObject(reportIdSql, Integer.class, username, reportId);
 
@@ -316,7 +316,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
     // GET /users/{username}/templates/{templateId}
     @Override
     public Template getUserTemplateById(String username, int templateId) {
-        final String sql = "SELECT * FROM Templates JOIN AccessRights AS A ON ID = templateID AND A.username = ? AND templateID = ?";
+        final String sql = "SELECT * FROM Templates JOIN AccessRights AS A ON ID = templateID AND BINARY A.username = ? AND templateID = ?";
         Template template = jdbcTemplate.queryForObject(sql, new TemplateRowMapper(), username, templateId);
         return template;
     }
@@ -324,7 +324,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
     // GET /users/{username}/templates/{templateId}/fields
     @Override
     public Collection<Field> getUserTemplateFieldsById(String username, int templateId) {
-        final String templateIdSql = "SELECT templateID FROM AccessRights WHERE username = ? AND templateID = ?";
+        final String templateIdSql = "SELECT templateID FROM AccessRights WHERE BINARY username = ? AND templateID = ?";
 
         int templateID = jdbcTemplate.queryForObject(templateIdSql, Integer.class, username, templateId);
 
@@ -338,7 +338,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
     // GET /users/{username}/templates/{templateId}/reports
     @Override
     public Collection<Report> getUserReportsByTemplateId(String username, int templateId, Map<String, String> params) {
-        final String sql = new SQLBuilder("SELECT * FROM Reports WHERE username = ? and templateID = ?", params)
+        final String sql = new SQLBuilder("SELECT * FROM Reports WHERE BINARY username = ? and templateID = ?", params)
                 .sqlSearch()
                 .sqlPagination()
                 .sqlSort()
