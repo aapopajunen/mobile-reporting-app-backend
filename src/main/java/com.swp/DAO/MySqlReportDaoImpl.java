@@ -426,7 +426,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
 
         public SQLBuilder sqlSort() {
             if(params.containsKey("sort")) {
-                this.setValue(this.getValue() + " ORDER BY " + "(" + params.get("sort") + ")");
+                this.setValue(this.getValue() + " ORDER BY " + params.get("sort"));
             }
 
             return this;
