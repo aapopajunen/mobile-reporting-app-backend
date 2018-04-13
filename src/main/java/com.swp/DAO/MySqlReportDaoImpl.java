@@ -1,86 +1,115 @@
 package com.swp.DAO;
 
+import com.mysql.cj.api.jdbc.Statement;
 import com.swp.Entity.*;
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
 @Repository
-@Qualifier("mysql")
+@Qualifier("mysqlnew")
 public class MySqlReportDaoImpl implements ReportDAO {
 
     //JDBCTEMPATE
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-
     //ROW MAPPERS
-
     public class ReportRowMapper implements RowMapper<Report> {
         @Override
         public Report mapRow(ResultSet resultSet, int i) throws SQLException {
-            return new Report(
-                    resultSet.getInt("id"),
-                    resultSet.getInt("templateId"),
-                    resultSet.getInt("userId"),
-                    resultSet.getInt("orderNo"),
+            Report report = new Report(
+                    resultSet.getInt("report_id"),
+                    resultSet.getInt("user_id"),
+                    resultSet.getInt("template_id"),
                     resultSet.getString("title"),
-                    resultSet.getDate("dateCreated"),
-                    resultSet.getDate("dateAccepted"),
-                    getAnswersByReportId(resultSet.getInt("id"))
+                    resultSet.getDate("date_created"),
+                    resultSet.getDate("date_accepted")
             );
+
+            final String stringAnswerSql = "SELECT * FROM string_answer WHERE report_id = ?";
+            Collection<StringAnswer> stringAnswers = jdbcTemplate.query(stringAnswerSql, new StringAnswerRowMapper(), report.getReport_id());
+
+            final String optionAnswerSql = "SELECT * FROM option_answer WHERE report_id = ?";
+            Collection<OptionAnswer> optionAnswers = jdbcTemplate.query(optionAnswerSql, new OptionAnswerRowMapper(), report.getReport_id());
+
+            report.setString_answers(stringAnswers);
+            report.setOption_answers(optionAnswers);
+
+            return report;
+        }
+    }
+
+    public class StringAnswerRowMapper implements RowMapper<StringAnswer> {
+        @Override
+        public StringAnswer mapRow(ResultSet resultSet, int i) throws SQLException {
+            return new StringAnswer(
+                    resultSet.getInt("string_answer_id"),
+                    resultSet.getInt("report_id"),
+                    resultSet.getInt("field_id"),
+                    resultSet.getString("value")
+            );
+        }
+    }
+
+    public class OptionAnswerRowMapper implements RowMapper<OptionAnswer> {
+        @Override
+        public OptionAnswer mapRow(ResultSet resultSet, int i) throws SQLException {
+            OptionAnswer optionAnswer = new OptionAnswer(
+                    resultSet.getInt("option_answer_id"),
+                    resultSet.getInt("report_id"),
+                    resultSet.getInt("field_option_id")
+            );
+
+            optionAnswer.setSelected(true);
+
+            return optionAnswer;
         }
     }
 
     public class FieldRowMapper implements RowMapper<Field> {
         @Override
         public Field mapRow(ResultSet resultSet, int i) throws SQLException {
-            return new Field(
-                    resultSet.getInt("id"),
-                    resultSet.getInt("templateId"),
+            Field field = new Field(
+                    resultSet.getInt("field_id"),
+                    resultSet.getInt("template_id"),
+                    resultSet.getInt("order_number"),
                     resultSet.getString("title"),
-                    resultSet.getString("defaultValue"),
-                    resultSet.getInt("typeID"),
-                    resultSet.getInt("orderNumber"),
-                    resultSet.getInt("required")
+                    resultSet.getBoolean("required"),
+                    FieldType.valueOf(resultSet.getString("type")),
+                    resultSet.getString("default_value")
             );
+
+            final String fieldOptionSql = "SELECT * FROM field_option WHERE field_id = ?";
+            Collection<FieldOption> fieldOptions = jdbcTemplate.query(fieldOptionSql, new FieldOptionRowMapper(), field.getField_id());
+
+            if(!fieldOptions.isEmpty()) {
+                field.setField_options(fieldOptions);
+            }
+
+            return field;
         }
     }
 
-    public class TemplateRowMapper implements RowMapper<Template> {
+    public class FieldOptionRowMapper implements RowMapper<FieldOption> {
         @Override
-        public Template mapRow(ResultSet resultSet, int i) throws SQLException {
-            final String amountOdReportsSql = "SELECT COUNT(*) FROM Reports WHERE templateid = ?";
-
-            return new Template(
-                   resultSet.getInt("id"),
-                   resultSet.getString("title"),
-                    resultSet.getInt("reportCount"),
-                    jdbcTemplate.queryForObject(amountOdReportsSql, Integer.class, resultSet.getInt("id"))
-            );
-        }
-    }
-
-    public class FieldAnswerRowMapper implements RowMapper<FieldAnswer> {
-        @Override
-        public FieldAnswer mapRow(ResultSet resultSet, int i) throws SQLException {
-            return new FieldAnswer(
-                    resultSet.getInt("fieldId"),
-                    resultSet.getInt("reportId"),
-                    resultSet.getString("answer")
+        public FieldOption mapRow(ResultSet resultSet, int i) throws SQLException {
+            return new FieldOption(
+                    resultSet.getInt("field_option_id"),
+                    resultSet.getInt("field_id"),
+                    resultSet.getString("value"),
+                    resultSet.getBoolean("default_value")
             );
         }
     }
@@ -89,51 +118,34 @@ public class MySqlReportDaoImpl implements ReportDAO {
         @Override
         public User mapRow(ResultSet resultSet, int i) throws SQLException {
             return new User(
-                    resultSet.getInt("id"),
+                    resultSet.getInt("user_id"),
                     resultSet.getString("username")
             );
         }
     }
 
-    public class AccessRightsRowMapper implements RowMapper<AccessRights> {
+    public class TemplateRowMapper implements RowMapper<Template> {
         @Override
-        public AccessRights mapRow(ResultSet resultSet, int i) throws SQLException {
-            return new AccessRights(
-                    resultSet.getInt("userId"),
-                    resultSet.getString("username"),
-                    resultSet.getInt("templateId")
+        public Template mapRow(ResultSet resultSet, int i) throws SQLException {
+            Template template = new Template(
+                   resultSet.getInt("template_id"),
+                   resultSet.getString("title")
             );
+
+            final String fieldsSql = "SELECT * FROM field WHERE template_id = ?";
+            Collection<Field> fields = jdbcTemplate.query(fieldsSql, new FieldRowMapper(), template.getTemplate_id());
+
+            template.setFields(fields);
+
+            return template;
         }
     }
 
     //METHODS
-    private Collection<FieldAnswer> getAnswersByReportId(int reportId) {
-        final String sql = "SELECT * FROM FieldAnswers WHERE reportID = ?";
-
-        Collection<FieldAnswer> fieldAnswers = jdbcTemplate.query(sql, new FieldAnswerRowMapper(),reportId);
-
-        return fieldAnswers;
-    }
-
-    public void deleteReportById(int reportId) {
-        final String reportDeleteSql = "DELETE FROM Reports WHERE id = ?";
-
-        final String answersDeleteSql = "DELETE FROM FieldAnswers WHERE reportID = ?";
-
-        jdbcTemplate.update(answersDeleteSql, reportId);
-        jdbcTemplate.update(reportDeleteSql, reportId);
-    }
-
-    public void acceptReportById(int reportId) {
-        final String sql = "UPDATE Reports SET dateAccepted = CURRENT_DATE () WHERE ID = ?";
-
-        jdbcTemplate.update(sql, reportId);
-    }
-
 
     @Override
     public User checkLoginCredentials(LoginCredentials loginCredentials) {
-        final String sql = "SELECT * FROM Users WHERE BINARY username = ? AND BINARY password = ?";
+        final String sql = "SELECT * FROM user WHERE BINARY username = ? AND BINARY password = ?";
 
         try {
             final User user = jdbcTemplate.queryForObject(sql, new UserRowMapper(),loginCredentials.getUsername(), loginCredentials.getPassword());
@@ -143,83 +155,24 @@ public class MySqlReportDaoImpl implements ReportDAO {
         }
     }
 
-
-
-    // POST /users/{username}
     @Override
-    public void createUser(String username) {
-        final String sql = "INSERT INTO Users (username) VALUES (?)";
+    public Collection<User> getAllUsers() {
+        final String sql = "SELECT user_id, username FROM user ORDER BY username";
 
-        jdbcTemplate.update(sql, username);
+        Collection<User> users = jdbcTemplate.query(sql, new UserRowMapper());
+
+        return users;
     }
-
-    // GET /users/{userid}
-    @Override
-    public User getUserById(int id) {
-        final String sql = "SELECT * FROM Users WHERE id = ?";
-
-        User user = jdbcTemplate.queryForObject(sql, new UserRowMapper(), id);
-
-        return user;
-    }
-
-    // DELETE /users/{userid}
-    @Override
-    public void deleteUserById(int id) {
-        final String sql = "DELETE FROM Users WHERE id = ?";
-
-        jdbcTemplate.update(sql, id);
-    }
-
-
-    // DELETE /users{userid}
-    @Override
-    public void deleteUserByUsername(String username) {
-        final String sql = "DELETE FROM Users WHERE BINARY username = ?";
-
-        jdbcTemplate.update(sql, username);
-    }
-
-    // GET /users/{username}/rights
-    @Override
-    public Collection<AccessRights> getUserAccessRights(String username) {
-        final String sql = "SELECT * FROM AccessRights WHERE BINARY username = ?";
-
-        Collection<AccessRights> accessRights = jdbcTemplate.query(sql, new AccessRightsRowMapper(), username);
-
-        return accessRights;
-    }
-
-    // POST /users/{username}/rights
-    @Override
-    public void grantUserAccessRights(String username, Map<String, String> params) {
-        final String sql = "INSERT INTO AccessRights (username, templateID) VALUES (?,?)";
-
-        if(params.containsKey("templateid")) {
-            jdbcTemplate.update(sql, username, params.get("templateid"));
-        }
-    }
-
-    // DELETE /users/{username}/rights
-    @Override
-    public void deleteUserAccessRights(String username, Map<String, String> params) {
-        final String sql = "DELETE FROM AccessRights WHERE BINARY username = ? AND templateid = ?";
-
-        if(params.containsKey("templateid")) {
-            jdbcTemplate.update(sql, username, params.get("templateid"));
-        }
-    }
-
 
     // GET /users/{username}/reports
     @Override
     public Collection<Report> getReportsByUser(String username, Map<String, String> params) {
-
-        final String sql = new SQLBuilder("SELECT * FROM Reports WHERE BINARY username = ?", params)
+        final String sql = new SQLBuilder("SELECT report.* FROM report INNER JOIN user ON report.user_id = user.user_id " +
+                "AND user.username = ?", params)
                 .sqlSearch()
                 .sqlSort()
                 .sqlPagination()
-                .getValue();
+                .value;
 
         Collection<Report> reports = jdbcTemplate.query(sql, new ReportRowMapper(), username);
 
@@ -229,125 +182,147 @@ public class MySqlReportDaoImpl implements ReportDAO {
     // GET /users/{username}/reports/{reportId}
     @Override
     public Report getUserReportById(String username, int reportId, Map<String, String> params) {
-        final String sql = "SELECT * FROM Reports AS R JOIN Users AS U ON BINARY U.username = R.username AND BINARY U.username = ? AND R.ID = ?";
+        final String sql = "SELECT r.* FROM report AS r INNER JOIN user AS u ON " +
+                "r.user_id = u.user_id AND u.username = username AND r.report_id = ?";
         Report report = jdbcTemplate.queryForObject(sql, new ReportRowMapper(), username, reportId);
         return report;
     }
 
-    // GET /users/{username}/reports/{reportid}/fields
-    @Override
-    public Collection<Field> getUserReportFieldsById(String username, int reportId) {
-        final String templateIdSql= "SELECT templateID FROM Reports WHERE BINARY username = ? AND ID = ?";
-
-        int templateId = jdbcTemplate.queryForObject(templateIdSql, Integer.class, username, reportId);
-
-        final String sql = "SELECT * FROM Fields WHERE templateID = ?";
-
-        Collection<Field> fields = jdbcTemplate.query(sql, new FieldRowMapper(), templateId);
-
-        return fields;
-    }
-
-    // GET /users/{username}/reports/{reportId}/answers
-    @Override
-    public Collection<FieldAnswer> getUserAnswersByReportId(String username, int reportId) {
-        final String reportIdSql = "SELECT ID FROM Reports WHERE BINARY username = ? AND ID = ?";
-
-        int reportID = jdbcTemplate.queryForObject(reportIdSql, Integer.class, username, reportId);
-
-        final String sql = "SELECT * FROM FieldAnswers WHERE reportID = ?";
-
-        Collection<FieldAnswer> answers = jdbcTemplate.query(sql, new FieldAnswerRowMapper(), reportID);
-        return answers;
-    }
-
     // POST /users/{username}/reports
+    // A BEAST OF A FUNCTION
     @Override
     public void createReport(String username, Report report) {
-        final String reportSql = "INSERT INTO Reports (templateId, username, orderNo, title, dateCreated) VALUES (?,?,?,?,?)";
+        final String insertReportSql =
+                "INSERT INTO report (user_id, template_id, title, date_created) " +
+                "VALUES (?,?,?,?);";
 
-        final String orderNoSql = "SELECT reportCount FROM Templates WHERE id = ?";
+        final String insertStringAnswersSql =
+                "INSERT INTO string_answer (report_id, field_id, value) " +
+                "VALUES (?,?,?)";
 
-        final String reportIdSql = "SELECT LAST_INSERT_ID()";
+        final String insertOptionAnswersSql =
+                "INSERT INTO option_answer (report_id, field_option_id) " +
+                "VALUES (?,?)";
 
-        final int orderNo = jdbcTemplate.queryForObject(orderNoSql, Integer.class, report.getTemplateID()) + 1;
-        jdbcTemplate.update(reportSql, report.getTemplateID(), username, orderNo, report.getTitle(), report.getDateCreated());
 
-        final int reportId = jdbcTemplate.queryForObject(reportIdSql, Integer.class);
+        // INSERT REPORT AND RETRIEVE ITS ID
+        KeyHolder key = new GeneratedKeyHolder();
+        jdbcTemplate.update(new PreparedStatementCreator() {
+            @Override
+            public java.sql.PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+                final java.sql.PreparedStatement ps =
+                        connection.prepareStatement(insertReportSql,
+                        Statement.RETURN_GENERATED_KEYS);
+                ps.setInt(1, report.getUser_id());
+                ps.setInt(2, report.getTemplate_id());
+                ps.setString(3, report.getTitle());
+                ps.setDate(4, report.getDate_created());
+                return ps;
+            }
+        }, key);
 
-        report.getAnswers().forEach(
-                (ans) -> {
-                    final String answerSql = "INSERT INTO FieldAnswers (fieldId, reportId, answer) VALUES (?,?,?)";
-                    jdbcTemplate.update(answerSql, ans.getFieldID(), reportId, ans.getAnswer());
-                }
-        );
+
+        // INSERT STRING ANSWERS
+        for(StringAnswer sa : report.getString_answers()) {
+            jdbcTemplate.update(
+                    insertStringAnswersSql,
+                    key.getKey().intValue(),
+                    sa.getField_id(),
+                    sa.getValue()
+            );
+        }
+
+        //INSERT OPTION ANSWERS
+        for(OptionAnswer oa : report.getOption_answers()) {
+            if(oa.isSelected()) {
+                jdbcTemplate.update(
+                        insertOptionAnswersSql,
+                        key.getKey().intValue(),
+                        oa.getField_option_id()
+                );
+            }
+        }
     }
 
     // /users/{username}/templates
     @Override
     public Collection<Template> getTemplatesByUser(String username, Map<String, String> params) {
+        final String sql =
+                "SELECT t.* FROM template AS t " +
+                "JOIN access_rights AS ar " +
+                "JOIN user AS u " +
+                "ON t.template_id = ar.template_id AND u.user_id = ar.user_id AND u.username = ?";
 
-        final String sql = new SQLBuilder("SELECT * FROM Templates WHERE id IN (:ids)", params)
-                .sqlSearch()
-                .sqlPagination()
-                .sqlSort()
-                .getValue();
-
-        final Collection<AccessRights> accessRights = this.getUserAccessRights(username);
-
-        Set<Integer> ids = new HashSet();
-        accessRights.forEach((ar) -> ids.add(ar.getTemplateID()));
-
-        MapSqlParameterSource parameters = new MapSqlParameterSource();
-        parameters.addValue("ids", ids);
-
-        Collection<Template> templates;
-
-        try {
-             templates = namedParameterJdbcTemplate.query(sql, parameters, new TemplateRowMapper());
-        } catch(Exception e) {
-            return null;
-        }
+        Collection<Template> templates = jdbcTemplate.query(sql, new TemplateRowMapper(), username);
 
         return templates;
     }
 
-
     // GET /users/{username}/templates/{templateId}
     @Override
     public Template getUserTemplateById(String username, int templateId) {
-        final String sql = "SELECT * FROM Templates JOIN AccessRights AS A ON ID = templateID AND BINARY A.username = ? AND templateID = ?";
+        final String sql =
+                "SELECT t.* FROM template AS t " +
+                "JOIN access_rights AS ar " +
+                "JOIN user AS u " +
+                "ON t.template_id = ar.template_id AND u.user_id = ar.user_id AND u.username = ? AND t.template_id = ?";
+
         Template template = jdbcTemplate.queryForObject(sql, new TemplateRowMapper(), username, templateId);
         return template;
     }
 
-    // GET /users/{username}/templates/{templateId}/fields
+    // GET /users/{username}/templates/{templateId}/empty
     @Override
-    public Collection<Field> getUserTemplateFieldsById(String username, int templateId) {
-        final String templateIdSql = "SELECT templateID FROM AccessRights WHERE BINARY username = ? AND templateID = ?";
+    public Report getEmptyTemplate(String username, int templateId) {
+        int userId = jdbcTemplate.queryForObject("SELECT user_id FROM user WHERE username = ?", Integer.class, username);
 
-        int templateID = jdbcTemplate.queryForObject(templateIdSql, Integer.class, username, templateId);
+        Template template = this.getUserTemplateById(username, templateId);
 
-        final String sql = "SELECT * FROM Fields WHERE templateID = ?";
+        Report report = new Report();
 
-        Collection<Field> fields = jdbcTemplate.query(sql, new FieldRowMapper(), templateID);
+        report.setTemplate_id(template.getTemplate_id());
+        report.setUser_id(userId);
 
-        return fields;
+        List<StringAnswer> stringAnswers = new ArrayList<>();
+        List<OptionAnswer> optionAnswers = new ArrayList<>();
+
+        for(Field f : template.getFields()) {
+            if(f.getType().hasNoOptions()) {
+                StringAnswer stringAnswer = new StringAnswer();
+                stringAnswer.setField_id(f.getField_id());
+                stringAnswer.setValue(f.getDefault_value());
+                stringAnswers.add(stringAnswer);
+            } else {
+                for(FieldOption fo : f.getField_options()){
+                    OptionAnswer optionAnswer = new OptionAnswer();
+                    optionAnswer.setField_option_id(fo.getField_option_id());
+                    optionAnswer.setSelected(fo.getDefault_value());
+                    optionAnswers.add(optionAnswer);
+                }
+            }
+        }
+        report.setString_answers(stringAnswers);
+        report.setOption_answers(optionAnswers);
+
+        return report;
     }
 
     // GET /users/{username}/templates/{templateId}/reports
     @Override
     public Collection<Report> getUserReportsByTemplateId(String username, int templateId, Map<String, String> params) {
-        final String sql = new SQLBuilder("SELECT * FROM Reports WHERE BINARY username = ? and templateID = ?", params)
+        final String sql = new SQLBuilder(
+                "SELECT r.* FROM report AS r JOIN user AS u " +
+                "ON r.user_id = u.user_id AND u.username = ? AND r.template_id = ?", params)
                 .sqlSearch()
-                .sqlPagination()
                 .sqlSort()
-                .getValue();
+                .sqlPagination()
+                .value;
 
         Collection<Report> reports = jdbcTemplate.query(sql, new ReportRowMapper(), username, templateId);
         return reports;
     }
 
+    // Class For Building SQL Querys fast!
     public class SQLBuilder {
 
         private String value;

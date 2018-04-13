@@ -1,24 +1,27 @@
 package com.swp.Entity;
 
+import java.util.Collection;
+
 public class Template {
-    private int ID;
+
+    private int template_id;
     private String title;
-    private int reportCount;
-    private int amountOfReports;
+    private Collection<Field> fields;
 
-    public Template(int ID, String title, int reportCount, int amountOfReports) {
-        this.ID = ID;
+    public Template(int template_id, String title) {
+        this.template_id = template_id;
         this.title = title;
-        this.reportCount = reportCount;
-        this.amountOfReports = amountOfReports;
     }
 
-    public int getID() {
-        return ID;
+    public Template() {
     }
 
-    public void setID(int ID) {
-        this.ID = ID;
+    public int getTemplate_id() {
+        return template_id;
+    }
+
+    public void setTemplate_id(int template_id) {
+        this.template_id = template_id;
     }
 
     public String getTitle() {
@@ -29,20 +32,11 @@ public class Template {
         this.title = title;
     }
 
-    public int getReportCount() {
-        return reportCount;
+    public Collection<Field> getFields() {
+        return fields;
     }
 
-    public void setReportCount(int reportCount) {
-        this.reportCount = reportCount;
-    }
-
-    public int getAmountOfReports() {
-        return amountOfReports;
-    }
-
-    public void setAmountOfReports(int amountOfReports) {
-        this.amountOfReports = amountOfReports;
+    public void setFields(Collection<Field> fields) {
+        this.fields = fields;
     }
 }
-

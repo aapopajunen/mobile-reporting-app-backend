@@ -3,84 +3,90 @@ package com.swp.Entity;
 import java.sql.Date;
 import java.util.Collection;
 
-/**
- * Example JSON
- *
- * {
- *     ID: 1
- *     templateID: 1
- *     userID: 1
- *     orderNo: 1
- *     title: "Report"
- *     dateCreated: "2017-1-1"
- *     dateAccepted: null
- *     answers: /forms/1/answers
- * }
- */
 public class Report {
-    private int ID;
-    private int templateID;
-    private int userID;
-    private int orderNo;
+
+    private Integer report_id;
+    private Integer user_id;
+    private Integer template_id;
     private String title;
-    private java.sql.Date dateCreated;
-    private java.sql.Date dateAccepted;
-    private Collection<FieldAnswer> answers;
+    private Date date_created;
+    private Date date_accepted;
+    private Collection<StringAnswer> string_answers;
+    private Collection<OptionAnswer> option_answers;
 
-    public Report(int ID, int templateID, int userID, int orderNo, String title, Date dateCreated, Date dateAccepted, Collection<FieldAnswer> answers) {
-        this.ID = ID;
-        this.templateID = templateID;
-        this.userID = userID;
-        this.orderNo = orderNo;
+    public Report(Integer report_id, Integer user_id, Integer template_id, String title, Date date_created, Date date_accepted) {
+        this.report_id = report_id;
+        this.user_id = user_id;
+        this.template_id = template_id;
         this.title = title;
-        this.dateCreated = dateCreated;
-        this.dateAccepted = dateAccepted;
-        this.answers = answers;
-    }
-
-    public Report(int ID, int templateID, int userID, int orderNo, String title, Date dateCreated, Date dateAccepted) {
-        this.ID = ID;
-        this.templateID = templateID;
-        this.userID = userID;
-        this.orderNo = orderNo;
-        this.title = title;
-        this.dateCreated = dateCreated;
-        this.dateAccepted = dateAccepted;
+        this.date_created = date_created;
+        this.date_accepted = date_accepted;
     }
 
     public Report() {
-
     }
 
-    public int getID() {
-        return ID;
+    public Integer getReport_id() {
+        return report_id;
     }
 
-    public int getTemplateID() {
-        return templateID;
+    public void setReport_id(Integer report_id) {
+        this.report_id = report_id;
     }
 
-    public int getUserID() {
-        return userID;
+    public Integer getUser_id() {
+        return user_id;
     }
 
-    public int getOrderNo() {
-        return orderNo;
+    public void setUser_id(Integer user_id) {
+        this.user_id = user_id;
+    }
+
+    public Integer getTemplate_id() {
+        return template_id;
+    }
+
+    public void setTemplate_id(Integer template_id) {
+        this.template_id = template_id;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public Date getDateCreated() {
-        return dateCreated;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public Date getDateAccepted() {
-        return dateAccepted;
+    public Date getDate_created() {
+        return date_created;
     }
 
-    public Collection<FieldAnswer> getAnswers() {
-        return answers;
+    public void setDate_created(Date date_created) {
+        this.date_created = date_created;
+    }
+
+    public Date getDate_accepted() {
+        return date_accepted;
+    }
+
+    public void setDate_accepted(Date date_accepted) {
+        this.date_accepted = date_accepted;
+    }
+
+    public Collection<StringAnswer> getString_answers() {
+        return string_answers;
+    }
+
+    public void setString_answers(Collection<StringAnswer> string_answers) {
+        this.string_answers = string_answers;
+    }
+
+    public Collection<OptionAnswer> getOption_answers() {
+        return option_answers;
+    }
+
+    public void setOption_answers(Collection<OptionAnswer> option_answers) {
+        this.option_answers = option_answers;
     }
 }
