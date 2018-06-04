@@ -14,10 +14,12 @@
 4. Configure the database connection using application.
    Copy this to application.properties:
    
+   ```
    spring.datasource.subType=com.zaxxer.hikari.HikariDataSource
    spring.datasource.url="YOUR DATABASE URL HERE"
    spring.datasource.username="YOUR DATABASE USERNAME HERE"
    spring.datasource.password="YOUR DATABASE PASSWORD HERE"
+   ```
    
 
 
