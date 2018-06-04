@@ -8,6 +8,7 @@
 
 #IDEA
 .idea/
+*.iml
 
 *.properties
 
@@ -16,6 +17,7 @@
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
+*.p12
 
 # Package Files #
 *.jar

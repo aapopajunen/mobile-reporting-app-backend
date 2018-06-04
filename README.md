@@ -11,11 +11,15 @@
 3. Create application.properties.
    >Create a file called application.properties into mobile-reporting-app-backend/src/main/resources. If the resources folder    does not exist, create it also.
    
-4. Configure the database connection using application.properties
-   >Copy this to application.properties:
+4. Configure the database connection using application.
+   Copy this to application.properties:
    
-   spring.datasource.type=com.zaxxer.hikari.HikariDataSource</br>
-   spring.datasource.url="YOUR DATABASE URL HERE"</br>
-   spring.datasource.username="YOUR DATABASE USERNAME HERE"</br>
-   spring.datasource.password="YOUR DATABASE PASSWORD HERE"</br>
+   spring.datasource.subType=com.zaxxer.hikari.HikariDataSource
+   spring.datasource.url="YOUR DATABASE URL HERE"
+   spring.datasource.username="YOUR DATABASE USERNAME HERE"
+   spring.datasource.password="YOUR DATABASE PASSWORD HERE"
+   
+
+
+
    
