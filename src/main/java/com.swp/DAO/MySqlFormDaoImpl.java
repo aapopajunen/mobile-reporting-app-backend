@@ -19,18 +19,18 @@ import java.util.*;
 
 @Repository
 @Qualifier("mysqlnew")
-public class MySqlReportDaoImpl implements ReportDAO {
+public class MySqlFormDaoImpl implements FormDAO {
 
     //JDBCTEMPATE
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
     //ROW MAPPERS
-    public class ReportRowMapper implements RowMapper<Report> {
+    public class FormRowMapper implements RowMapper<Form> {
         @Override
-        public Report mapRow(ResultSet resultSet, int i) throws SQLException {
-            Report report = new Report(
-                    resultSet.getInt("report_id"),
+        public Form mapRow(ResultSet resultSet, int i) throws SQLException {
+            Form form = new Form(
+                    resultSet.getInt("form_id"),
                     resultSet.getInt("user_id"),
                     resultSet.getInt("template_id"),
                     resultSet.getString("title"),
@@ -38,16 +38,16 @@ public class MySqlReportDaoImpl implements ReportDAO {
                     resultSet.getDate("date_accepted")
             );
 
-            final String stringAnswerSql = "SELECT * FROM string_answer WHERE report_id = ?";
-            Collection<StringAnswer> stringAnswers = jdbcTemplate.query(stringAnswerSql, new StringAnswerRowMapper(), report.getReport_id());
+            final String stringAnswerSql = "SELECT * FROM string_answer WHERE form_id = ?";
+            Collection<StringAnswer> stringAnswers = jdbcTemplate.query(stringAnswerSql, new StringAnswerRowMapper(), form.getForm_id());
 
-            final String optionAnswerSql = "SELECT * FROM option_answer WHERE report_id = ?";
-            Collection<OptionAnswer> optionAnswers = jdbcTemplate.query(optionAnswerSql, new OptionAnswerRowMapper(), report.getReport_id());
+            final String optionAnswerSql = "SELECT * FROM option_answer WHERE form_id = ?";
+            Collection<OptionAnswer> optionAnswers = jdbcTemplate.query(optionAnswerSql, new OptionAnswerRowMapper(), form.getForm_id());
 
-            report.setString_answers(stringAnswers);
-            report.setOption_answers(optionAnswers);
+            form.setString_answers(stringAnswers);
+            form.setOption_answers(optionAnswers);
 
-            return report;
+            return form;
         }
     }
 
@@ -56,7 +56,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
         public StringAnswer mapRow(ResultSet resultSet, int i) throws SQLException {
             return new StringAnswer(
                     resultSet.getInt("string_answer_id"),
-                    resultSet.getInt("report_id"),
+                    resultSet.getInt("form_id"),
                     resultSet.getInt("field_id"),
                     resultSet.getString("value")
             );
@@ -68,7 +68,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
         public OptionAnswer mapRow(ResultSet resultSet, int i) throws SQLException {
             OptionAnswer optionAnswer = new OptionAnswer(
                     resultSet.getInt("option_answer_id"),
-                    resultSet.getInt("report_id"),
+                    resultSet.getInt("form_id"),
                     resultSet.getInt("field_option_id")
             );
 
@@ -164,66 +164,66 @@ public class MySqlReportDaoImpl implements ReportDAO {
         return users;
     }
 
-    // GET /users/{username}/reports
+    // GET /users/{username}/forms
     @Override
-    public Collection<Report> getReportsByUser(String username, Map<String, String> params) {
-        final String sql = new SQLBuilder("SELECT report.* FROM report INNER JOIN user ON report.user_id = user.user_id " +
+    public Collection<Form> getFormsByUser(String username, Map<String, String> params) {
+        final String sql = new SQLBuilder("SELECT form.* FROM form INNER JOIN user ON form.user_id = user.user_id " +
                 "AND user.username = ?", params)
                 .sqlSearch()
                 .sqlSort()
                 .sqlPagination()
                 .value;
 
-        Collection<Report> reports = jdbcTemplate.query(sql, new ReportRowMapper(), username);
+        Collection<Form> forms = jdbcTemplate.query(sql, new FormRowMapper(), username);
 
-        return reports;
+        return forms;
     }
 
-    // GET /users/{username}/reports/{reportId}
+    // GET /users/{username}/forms/{formId}
     @Override
-    public Report getUserReportById(String username, int reportId, Map<String, String> params) {
-        final String sql = "SELECT r.* FROM report AS r INNER JOIN user AS u ON " +
-                "r.user_id = u.user_id AND u.username = username AND r.report_id = ?";
-        Report report = jdbcTemplate.queryForObject(sql, new ReportRowMapper(), username, reportId);
-        return report;
+    public Form getUserFormById(String username, int formId, Map<String, String> params) {
+        final String sql = "SELECT r.* FROM form AS r INNER JOIN user AS u ON " +
+                "r.user_id = u.user_id AND u.username = username AND r.form_id = ?";
+        Form form = jdbcTemplate.queryForObject(sql, new FormRowMapper(), username, formId);
+        return form;
     }
 
-    // POST /users/{username}/reports
+    // POST /users/{username}/forms
     // A BEAST OF A FUNCTION
     @Override
-    public void createReport(String username, Report report) {
-        final String insertReportSql =
-                "INSERT INTO report (user_id, template_id, title, date_created) " +
+    public void createForm(String username, Form form) {
+        final String insertFormSql =
+                "INSERT INTO form (user_id, template_id, title, date_created) " +
                 "VALUES (?,?,?,?);";
 
         final String insertStringAnswersSql =
-                "INSERT INTO string_answer (report_id, field_id, value) " +
+                "INSERT INTO string_answer (form_id, field_id, value) " +
                 "VALUES (?,?,?)";
 
         final String insertOptionAnswersSql =
-                "INSERT INTO option_answer (report_id, field_option_id) " +
+                "INSERT INTO option_answer (form_id, field_option_id) " +
                 "VALUES (?,?)";
 
 
-        // INSERT REPORT AND RETRIEVE ITS ID
+        // INSERT FORM AND RETRIEVE ITS ID
         KeyHolder key = new GeneratedKeyHolder();
         jdbcTemplate.update(new PreparedStatementCreator() {
             @Override
             public java.sql.PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
                 final java.sql.PreparedStatement ps =
-                        connection.prepareStatement(insertReportSql,
+                        connection.prepareStatement(insertFormSql,
                         Statement.RETURN_GENERATED_KEYS);
-                ps.setInt(1, report.getUser_id());
-                ps.setInt(2, report.getTemplate_id());
-                ps.setString(3, report.getTitle());
-                ps.setDate(4, report.getDate_created());
+                ps.setInt(1, form.getUser_id());
+                ps.setInt(2, form.getTemplate_id());
+                ps.setString(3, form.getTitle());
+                ps.setDate(4, form.getDate_created());
                 return ps;
             }
         }, key);
 
 
         // INSERT STRING ANSWERS
-        for(StringAnswer sa : report.getString_answers()) {
+        for(StringAnswer sa : form.getString_answers()) {
             jdbcTemplate.update(
                     insertStringAnswersSql,
                     key.getKey().intValue(),
@@ -233,7 +233,7 @@ public class MySqlReportDaoImpl implements ReportDAO {
         }
 
         //INSERT OPTION ANSWERS
-        for(OptionAnswer oa : report.getOption_answers()) {
+        for(OptionAnswer oa : form.getOption_answers()) {
             if(oa.isSelected()) {
                 jdbcTemplate.update(
                         insertOptionAnswersSql,
@@ -273,15 +273,15 @@ public class MySqlReportDaoImpl implements ReportDAO {
 
     // GET /users/{username}/templates/{templateId}/empty
     @Override
-    public Report getEmptyTemplate(String username, int templateId) {
+    public Form getEmptyTemplate(String username, int templateId) {
         int userId = jdbcTemplate.queryForObject("SELECT user_id FROM user WHERE username = ?", Integer.class, username);
 
         Template template = this.getUserTemplateById(username, templateId);
 
-        Report report = new Report();
+        Form form = new Form();
 
-        report.setTemplate_id(template.getTemplate_id());
-        report.setUser_id(userId);
+        form.setTemplate_id(template.getTemplate_id());
+        form.setUser_id(userId);
 
         List<StringAnswer> stringAnswers = new ArrayList<>();
         List<OptionAnswer> optionAnswers = new ArrayList<>();
@@ -301,25 +301,25 @@ public class MySqlReportDaoImpl implements ReportDAO {
                 }
             }
         }
-        report.setString_answers(stringAnswers);
-        report.setOption_answers(optionAnswers);
+        form.setString_answers(stringAnswers);
+        form.setOption_answers(optionAnswers);
 
-        return report;
+        return form;
     }
 
-    // GET /users/{username}/templates/{templateId}/reports
+    // GET /users/{username}/templates/{templateId}/forms
     @Override
-    public Collection<Report> getUserReportsByTemplateId(String username, int templateId, Map<String, String> params) {
+    public Collection<Form> getUserFormsByTemplateId(String username, int templateId, Map<String, String> params) {
         final String sql = new SQLBuilder(
-                "SELECT r.* FROM report AS r JOIN user AS u " +
+                "SELECT r.* FROM form AS r JOIN user AS u " +
                 "ON r.user_id = u.user_id AND u.username = ? AND r.template_id = ?", params)
                 .sqlSearch()
                 .sqlSort()
                 .sqlPagination()
                 .value;
 
-        Collection<Report> reports = jdbcTemplate.query(sql, new ReportRowMapper(), username, templateId);
-        return reports;
+        Collection<Form> forms = jdbcTemplate.query(sql, new FormRowMapper(), username, templateId);
+        return forms;
     }
 
     // Class For Building SQL Querys fast!

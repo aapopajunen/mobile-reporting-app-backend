@@ -5,21 +5,21 @@ import com.swp.Entity.*;
 import java.util.Collection;
 import java.util.Map;
 
-public interface ReportDAO {
+public interface FormDAO {
 
     User checkLoginCredentials(LoginCredentials loginCredentials);
 
     // /users
     Collection<User> getAllUsers();
 
-    // /users/{username}/reports
-    Collection<Report> getReportsByUser(String username, Map<String, String> params);
+    // /users/{username}/forms
+    Collection<Form> getFormsByUser(String username, Map<String, String> params);
 
-    // /users/{username}/reports
-    void createReport(String username, Report report);
+    // /users/{username}/forms
+    void createForm(String username, Form form);
 
-    // /users/{username}/reports/{reportId}
-    Report getUserReportById(String username, int reportId, Map<String, String> params);
+    // /users/{username}/forms/{formId}
+    Form getUserFormById(String username, int formId, Map<String, String> params);
 
     // /users/{username}/templates
     Collection<Template> getTemplatesByUser(String username, Map<String, String> params);
@@ -30,8 +30,8 @@ public interface ReportDAO {
     // users/{username}/templates/{templateId}/empty
     Object getEmptyTemplate(String username, int templateId);
 
-    // users/{username}/templates/{templateId}/reports
-    Collection<Report> getUserReportsByTemplateId(String username, int templateId, Map<String, String> params);
+    // users/{username}/templates/{templateId}/forms
+    Collection<Form> getUserFormsByTemplateId(String username, int templateId, Map<String, String> params);
 
 
 }

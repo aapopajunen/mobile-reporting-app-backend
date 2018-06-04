@@ -3,13 +3,13 @@ package com.swp.Entity;
 public class StringAnswer {
 
     private Integer string_answer_id;
-    private Integer report_id;
+    private Integer form_id;
     private Integer field_id;
     private String value;
 
-    public StringAnswer(Integer string_answer_id, Integer report_id, Integer field_id, String value) {
+    public StringAnswer(Integer string_answer_id, Integer form_id, Integer field_id, String value) {
         this.string_answer_id = string_answer_id;
-        this.report_id = report_id;
+        this.form_id = form_id;
         this.field_id = field_id;
         this.value = value;
     }
@@ -25,12 +25,12 @@ public class StringAnswer {
         this.string_answer_id = string_answer_id;
     }
 
-    public Integer getReport_id() {
-        return report_id;
+    public Integer getForm_id() {
+        return form_id;
     }
 
-    public void setReport_id(Integer report_id) {
-        this.report_id = report_id;
+    public void setForm_id(Integer form_id) {
+        this.form_id = form_id;
     }
 
     public Integer getField_id() {

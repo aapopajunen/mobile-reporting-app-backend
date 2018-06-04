@@ -3,9 +3,9 @@ package com.swp.Entity;
 import java.sql.Date;
 import java.util.Collection;
 
-public class Report {
+public class Form {
 
-    private Integer report_id;
+    private Integer form_id;
     private Integer user_id;
     private Integer template_id;
     private String title;
@@ -14,8 +14,8 @@ public class Report {
     private Collection<StringAnswer> string_answers;
     private Collection<OptionAnswer> option_answers;
 
-    public Report(Integer report_id, Integer user_id, Integer template_id, String title, Date date_created, Date date_accepted) {
-        this.report_id = report_id;
+    public Form(Integer form_id, Integer user_id, Integer template_id, String title, Date date_created, Date date_accepted) {
+        this.form_id = form_id;
         this.user_id = user_id;
         this.template_id = template_id;
         this.title = title;
@@ -23,15 +23,15 @@ public class Report {
         this.date_accepted = date_accepted;
     }
 
-    public Report() {
+    public Form() {
     }
 
-    public Integer getReport_id() {
-        return report_id;
+    public Integer getForm_id() {
+        return form_id;
     }
 
-    public void setReport_id(Integer report_id) {
-        this.report_id = report_id;
+    public void setForm_id(Integer form_id) {
+        this.form_id = form_id;
     }
 
     public Integer getUser_id() {
