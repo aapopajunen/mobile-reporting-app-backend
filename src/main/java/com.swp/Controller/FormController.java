@@ -1,6 +1,6 @@
 package com.swp.Controller;
 
-import com.swp.DAO.ReportDAO;
+import com.swp.DAO.FormDAO;
 import com.swp.Entity.*;
 import com.swp.Security.JwtGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,29 +14,29 @@ import java.util.Map;
 
 
 @RestController
-public class ReportController {
+public class FormController {
 
     /**
-     * Report Data Access Object.
+     * Form Data Access Object.
      */
     @Autowired
     @Qualifier("mysqlnew")
-    private ReportDAO reportDAO;
+    private FormDAO formDAO;
 
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public SimpleToken login(@RequestBody LoginCredentials loginCredentials) {
-        User user = reportDAO.checkLoginCredentials(loginCredentials);
+        User user = formDAO.checkLoginCredentials(loginCredentials);
         return new SimpleToken(new JwtGenerator().generate(user));
     }
 
 
     @GetMapping("/users")
     public Collection<User> getAllUsers() {
-        return reportDAO.getAllUsers();
+        return formDAO.getAllUsers();
     }
 
     /**
-     * This function is used for getting reports of a user.
+     * This function is used for getting forms of a user.
      *
      * Parameters:
      * templateid,
@@ -47,43 +47,43 @@ public class ReportController {
      *
      * @param username The username specific to the user.
      * @param params Query parameters from the url
-     * @return Returns a collection of reports filled by a user.
+     * @return Returns a collection of forms filled by a user.
      */
-    @GetMapping("/users/{username}/reports")
+    @GetMapping("/users/{username}/forms")
     @PreAuthorize("#username == authentication.name")
-    public Collection<Report> getReportsByUser(
+    public Collection<Form> getFormsByUser(
             @PathVariable("username") String username,
             @RequestParam Map<String, String> params) {
-        return reportDAO.getReportsByUser(username, params);
+        return formDAO.getFormsByUser(username, params);
     }
 
 
     /**
-     * This function is used for creating a new report. The report is created based on the
+     * This function is used for creating a new form. The form is created based on the
      * information provided in the json.
      *
      * @param username The username specific to the user.
-     * @param report The report to be added to the database.
+     * @param form The form to be added to the database.
      */
-    @PostMapping(value = "/users/{username}/reports", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/users/{username}/forms", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("#username == authentication.name")
-    public void createReport(@PathVariable String username, @RequestBody Report report) {
-        reportDAO.createReport(username, report);
+    public void createForm(@PathVariable String username, @RequestBody Form form) {
+        formDAO.createForm(username, form);
     }
 
     /**
-     * This function is used for getting a report by id that the user has submitted.
+     * This function is used for getting a form by id that the user has submitted.
      *
      * @param username The username specific to the user.
-     * @param reportID The id of the report.
+     * @param formID The id of the form.
      */
-    @GetMapping("/users/{username}/reports/{reportId}")
+    @GetMapping("/users/{username}/forms/{formId}")
     @PreAuthorize("#username == authentication.name")
-    public Report getUserReportById (
+    public Form getUserFormById (
             @PathVariable("username") String username,
-            @PathVariable("reportId") int reportID,
+            @PathVariable("formId") int formID,
             @RequestParam Map<String, String> params) {
-        return reportDAO.getUserReportById(username, reportID, params);
+        return formDAO.getUserFormById(username, formID, params);
     }
 
     /**
@@ -98,7 +98,7 @@ public class ReportController {
     public Collection<Template> getTemplatesByUser (
             @PathVariable("username") String username,
             @RequestParam Map<String, String> params) {
-        return reportDAO.getTemplatesByUser(username, params);
+        return formDAO.getTemplatesByUser(username, params);
     }
 
     /**
@@ -113,7 +113,7 @@ public class ReportController {
     public Template getUserTemplateById (
             @PathVariable("username") String username,
             @PathVariable("templateId") int templateId) {
-        return reportDAO.getUserTemplateById(username, templateId);
+        return formDAO.getUserTemplateById(username, templateId);
     }
 
     @GetMapping("/users/{username}/templates/{templateId}/empty")
@@ -121,23 +121,23 @@ public class ReportController {
     public Object getEmptyTemplate(
             @PathVariable("username") String username,
             @PathVariable("templateId") int templateId) {
-        return reportDAO.getEmptyTemplate(username, templateId);
+        return formDAO.getEmptyTemplate(username, templateId);
     }
 
     /**
-     * This function is used for getting all the reports of a certain template made by the user.
+     * This function is used for getting all the forms of a certain template made by the user.
      *
      * @param username The username unique to the user.
      * @param templateId The id of the template
-     * @return Returns a collection of the reports.
+     * @return Returns a collection of the forms.
      */
-    @GetMapping("/users/{username}/templates/{templateId}/reports")
+    @GetMapping("/users/{username}/templates/{templateId}/forms")
     @PreAuthorize("#username == authentication.name")
-    public Collection<Report> getUserReportsByTemplateId (
+    public Collection<Form> getUserFormsByTemplateId (
             @PathVariable("username") String username,
             @PathVariable("templateId") int templateId,
             @RequestParam Map<String, String> params) {
-        return reportDAO.getUserReportsByTemplateId(username, templateId, params);
+        return formDAO.getUserFormsByTemplateId(username, templateId, params);
     }
 
 
